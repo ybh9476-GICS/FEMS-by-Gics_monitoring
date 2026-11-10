@@ -25,6 +25,10 @@
 .schematic-node[data-tone="7"]{--card-accent:#7b7194;--card-background:#f2f0f7;--card-border:#c6bfd6}
 .schematic-node .schematic-card{fill:var(--card-background);stroke:var(--card-border);stroke-width:1.3}
 .schematic-node .schematic-card-accent{fill:var(--card-accent);stroke:none;pointer-events:none}
+.schematic-node[data-communication-status="normal"] .schematic-card-accent{fill:#2e9b54}
+.schematic-node[data-communication-status="error"] .schematic-card-accent{fill:#d54b48}
+.schematic-node[data-communication-status="disconnected"] .schematic-card-accent{fill:#929b99}
+.schematic-node-metric{font-size:10px;fill:#526571}
 .schematic-node.neighbor .schematic-card{stroke:var(--card-accent);stroke-width:1.8}
 .schematic-node:hover .schematic-card,.schematic-node:focus-visible .schematic-card{stroke:var(--card-accent);stroke-width:2.5}
 .schematic-node.selected .schematic-card{stroke:var(--card-accent);stroke-width:3.5}

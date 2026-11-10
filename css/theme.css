@@ -1,0 +1,113 @@
+/* UI-only theme. No canvas filters, scene materials, lighting or camera changes. */
+:root[data-theme=dark]{
+  color:#dfebe8;background:#111b22;color-scheme:dark;
+  --ui-bg:#111b22;--ui-panel:#19272e;--ui-raised:#22343b;--ui-input:#132128;
+  --ui-text:#dfebe8;--ui-muted:#a2b6b4;--ui-accent:#75d4b5;--ui-selected:#28483f;
+  --green:#227b69;--line:#35494e;--muted:#a2b6b4;
+}
+/* Keep the rendered scene and its overlays in their existing light palette. */
+:root[data-theme=dark] .viewport{color:#283c43;--line:#e2e8e8;color-scheme:light}
+:root[data-theme=dark] :is(.floor-dialog-preview,#asset-preview){color:#283c43;color-scheme:light}
+:root[data-theme=dark] :is(.topbar,.catalog-panel,.inspector,.equipment-dock){background:var(--ui-panel);color:var(--ui-text)}
+:root[data-theme=dark] :is(.editor-toolbar,.statusbar){background:var(--ui-bg);color:var(--ui-muted)}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,.statusbar,dialog,#monitor-dashboard,#monitor-details,#schematic) :is(button,input,select,textarea){color:var(--ui-text);background-color:var(--ui-input);border-color:var(--line)}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button:hover{background-color:var(--ui-raised);border-color:#638b80}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button:focus-visible,
+:root[data-theme=dark] :is(input,select,textarea):focus-visible{outline-color:var(--ui-accent)}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button.primary{background:#227b69;border-color:#389e88;color:#fff}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button.primary:hover{background:#2b8e79}
+:root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button.danger{color:#f5a59a}
+:root[data-theme=dark] input::placeholder{color:#90a6a6;opacity:1}
+:root[data-theme=dark] input[type=checkbox]{accent-color:#4cb99c}
+:root[data-theme=dark] :is(.brand strong span,.brand small,.project-title,.eyebrow,.panel-hint,.panel-title,.library-foot,.description,.dimension-note,.live-edit-note,.ratio-lock,.selection-card small,.inspector-empty,.inspector-empty p,.project-card small,label,legend,label>span,legend span,.site-area,.floor-spacing){color:var(--ui-muted)}
+:root[data-theme=dark] :is(.count-badge,.tree-count,.search-box,.workflow){background:var(--ui-raised);border-color:var(--line);color:var(--ui-muted)}
+:root[data-theme=dark] :is(.local-tag,kbd,fieldset,.inspector .panel-heading,.space-breadcrumb,.floor-slot,.floor-slot-dimensions){border-color:var(--line)}
+:root[data-theme=dark] :is(.inspector-empty h3,.workflow b,.workflow span,.statusbar strong,.project-card button,.floor-slot strong,.floor-spacing output,.power-current-list li span,.power-current-list .power-none){color:#afd5c6}
+:root[data-theme=dark] :is(.tree-name strong,.tree-document-row strong){color:var(--ui-text)}
+:root[data-theme=dark] .tree-row[data-space-kind=site] .tree-name strong{color:#7bd59a}
+:root[data-theme=dark] .tree-row:is([data-space-kind=building],[data-space-kind=floor]) .tree-name strong{color:#8ebaff}
+:root[data-theme=dark] #equipment-tree ul{border-color:var(--line)}
+:root[data-theme=dark] :is(.tree-row,.tree-document-row):hover{background:var(--ui-raised)}
+:root[data-theme=dark] [role=treeitem][aria-selected=true]>.tree-row,
+:root[data-theme=dark] :is(.tree-row,.tree-document-row).drop-target{background:var(--ui-selected);border-color:#71b79c}
+:root[data-theme=dark] .tree-row.drop-invalid{background:#493131;border-color:#d78c7b}
+:root[data-theme=dark] :is(.tabs button,.history-tools button,.asset-library-bar button,.tree-toggle,.space-breadcrumb button){background:transparent;color:var(--ui-muted);border-color:transparent}
+:root[data-theme=dark] :is(.tabs button[aria-selected=true],.asset-library-bar button[aria-pressed=true],.history-tools #labels-toggle[aria-pressed=true],#connection-corner[aria-pressed=true]){background:var(--ui-selected);color:var(--ui-accent);border-color:#4f8875}
+:root[data-theme=dark] .space-breadcrumb button[aria-current]{color:var(--ui-text)}
+:root[data-theme=dark] .divider{background:var(--line)}
+:root[data-theme=dark] :is(.equipment-card,.catalog-item){background:var(--ui-panel);border-color:var(--line);color:var(--ui-text)}
+:root[data-theme=dark] .catalog-item[aria-pressed=true]{background:var(--ui-selected);border-color:#71b79c}
+:root[data-theme=dark] .number-scrub{background:var(--ui-raised);color:var(--ui-muted);border-color:var(--line)}
+:root[data-theme=dark] :is(.error-message,button.danger){color:#f5a59a}
+:root[data-theme=dark] #connection-selection{color:var(--ui-accent)}
+:root[data-theme=dark] #connection-palette button{background:var(--swatch);border-color:transparent}
+:root[data-theme=dark] #connection-palette button[aria-pressed=true]{border-color:#fff;box-shadow:0 0 0 2px #75d4b5}
+
+/* Dialogs share the same surfaces, including nested help and project dialogs. */
+:root[data-theme=dark] :is(#settings-dialog,#help-dialog,#help-image-dialog,#asset-dialog,#asset-delete-dialog,#floor-delete-dialog,#floor-registration,#power-picker,#connection-reset-dialog,#connection-optimize-dialog,#default-dialog){background:var(--ui-panel);color:var(--ui-text);border-color:var(--line);box-shadow:0 18px 60px #0006}
+:root[data-theme=dark] :is(#settings-dialog,#help-dialog,#help-image-dialog,#asset-dialog,#asset-delete-dialog,#floor-delete-dialog,#floor-registration,#power-picker,#connection-reset-dialog,#connection-optimize-dialog,#default-dialog)::backdrop{background:#07121699}
+:root[data-theme=dark] :is(#asset-kind,#equipment-space,#equipment-power-parent,#default-source){background:var(--ui-input);color:var(--ui-text);border-color:var(--line)}
+:root[data-theme=dark] :is(#asset-dialog label,#asset-dialog .asset-help,#asset-delete-message,#floor-delete-message,#power-picker .power-help,#asset-library-status,.space-membership-path,.power-caption,.power-tree-row small){color:var(--ui-muted)}
+:root[data-theme=dark] .power-tree-row .power-node[aria-pressed=true]{background:var(--ui-selected);color:var(--ui-accent);border-color:#60947f}
+:root[data-theme=dark] .tree-drop-hint{background:var(--ui-selected);color:var(--ui-text)}
+:root[data-theme=dark] .tree-drop-hint.invalid{background:#493131;color:#f5a59a}
+:root[data-theme=dark] dialog :is(header,footer,fieldset,.settings-options,.help-nav,.help-content section,.help-shortcuts>div,.floor-dialog-controls,.floor-dialog-actions,#help-image-caption){border-color:var(--line)}
+:root[data-theme=dark] dialog :is(h2,h3,h4,legend,.help-content strong,.help-content h3 span,.help-regions dt){color:var(--ui-text)}
+:root[data-theme=dark] dialog :is(label,.dialog-message,.help-header p,.help-note,.help-footer span,.help-figure figcaption,.help-image-open span,#floor-registration-building){color:var(--ui-muted)}
+:root[data-theme=dark] .dialog-message strong{color:#f0b28b}
+:root[data-theme=dark] :is(.settings-options,.help-nav,.help-regions>div,.help-image-open,.help-image-stage,.help-content kbd,.help-content code){background:var(--ui-input);color:var(--ui-muted);border-color:var(--line)}
+:root[data-theme=dark] .settings-options button{background:transparent;color:var(--ui-muted);border-color:transparent}
+:root[data-theme=dark] .settings-options button[aria-pressed=true]{background:var(--ui-selected);color:var(--ui-accent);border-color:#60947f;box-shadow:none}
+:root[data-theme=dark] .help-nav button{background:transparent;color:var(--ui-muted)}
+:root[data-theme=dark] .help-nav button:hover{background:var(--ui-selected);color:var(--ui-accent)}
+:root[data-theme=dark] .localized-file{background:var(--ui-input);border-color:var(--line)}
+:root[data-theme=dark] .localized-file-button{background:var(--ui-raised);color:var(--ui-text);border-color:var(--line)}
+
+/* Monitoring cards: preserve the chart/status hues while increasing contrast. */
+:root[data-theme=dark] body[data-workspace-mode=monitoring] #monitor-dashboard{background:var(--ui-bg)}
+:root[data-theme=dark] body[data-workspace-mode=monitoring] #monitor-details{background:var(--ui-panel);color:var(--ui-text)}
+:root[data-theme=dark] .monitor-dashboard-tabs button{background:transparent;color:var(--ui-muted);border-color:transparent}
+:root[data-theme=dark] .monitor-dashboard-tabs button[aria-selected=true]{background:var(--ui-selected);color:var(--ui-accent)}
+:root[data-theme=dark] #monitor-dashboard-tools button{background:var(--ui-panel);color:var(--ui-text);border-color:var(--line)}
+:root[data-theme=dark] .dashboard-card{background:var(--ui-panel);color:var(--ui-text);border-color:var(--line)}
+:root[data-theme=dark] :is(.dashboard-card h3,.ups-device-card h4,.ups-dashboard-group>h3){color:#c6dcd5}
+:root[data-theme=dark] :is(.dashboard-unit,.dashboard-demo,.dashboard-card-footer,.dashboard-legend,.dashboard-comparisons,.dashboard-bar-row,.emissions-card dt,.solar-generation-stats dt,.solar-generation-stats time,.ess-energy-card dt,.ups-status-table .dashboard-unit){color:var(--ui-muted)}
+:root[data-theme=dark] :is(.dashboard-card-footer b,.dashboard-chip b){color:var(--ui-text)}
+:root[data-theme=dark] :is(.dashboard-chip,.solar-generation-body,.ess-pcs-status,.ess-energy-card dl>div){background:var(--ui-input);border-color:var(--line);color:var(--ui-text)}
+:root[data-theme=dark] .dashboard-chip{color:var(--ui-muted)}
+:root[data-theme=dark] :is(.gauge-track,.solar-ring-track){stroke:#30474c}
+:root[data-theme=dark] :is(.dashboard-bar-track,.ess-battery>div){background:#30474c}
+:root[data-theme=dark] .chart-grid line{stroke:#35494e}
+:root[data-theme=dark] :is(.chart-grid text,.chart-labels text){fill:var(--ui-muted)}
+:root[data-theme=dark] :is(.dashboard-comparisons b,.inverter-state.running,.ess-bms-charge td){color:#75d4b5}
+:root[data-theme=dark] :is(.ups-alarm,.inverter-state.standby){color:#e8c37b}
+:root[data-theme=dark] .inverter-missing{color:var(--ui-muted)}
+:root[data-theme=dark] .ess-discharging{color:#f1a0a5}
+:root[data-theme=dark] :is(.emissions-card dl>div,.ess-pcs-status>span){border-color:var(--line)}
+:root[data-theme=dark] .ess-energy-card .charging{background:#403827}
+:root[data-theme=dark] .ess-energy-card .discharging{background:#244237}
+:root[data-theme=dark] :is(.ess-table,.ups-status-table,.solar-inverter-table),
+:root[data-theme=dark] :is(.ess-table,.ups-status-table,.solar-inverter-table) :is(th,td){border-color:var(--line)}
+:root[data-theme=dark] :is(.ess-table,.ups-status-table,.solar-inverter-table) th{background:var(--ui-raised);color:#b1cac3}
+:root[data-theme=dark] .ups-status-table td{background:var(--ui-panel)}
+:root[data-theme=dark] .ess-savings-table caption{color:#b1cac3}
+:root[data-theme=dark] .dashboard-strip{scrollbar-color:#57756e var(--ui-bg)}
+:root[data-theme=dark] .dashboard-strip::-webkit-scrollbar-thumb{background:#57756e}
+:root[data-theme=dark] .dashboard-strip::-webkit-scrollbar-track{background:var(--ui-bg)}
+
+/* The schematic is a 2D UI; actual 3D/plan-view canvases remain untouched. */
+:root[data-theme=dark] #schematic{background:var(--ui-bg);color:var(--ui-text);--line:#35494e;color-scheme:dark}
+:root[data-theme=dark] .schematic-tools{background:var(--ui-panel);border-color:var(--line)}
+:root[data-theme=dark] .schematic-tools strong{color:var(--ui-text)}
+:root[data-theme=dark] .schematic-canvas{background-image:radial-gradient(#35494e .7px,transparent .7px)}
+:root[data-theme=dark] .schematic-node{--card-background:#23343f;--card-border:#617c8e;--card-accent:#99b5ca}
+:root[data-theme=dark] .schematic-node[data-tone="1"]{--card-background:#213842;--card-border:#587e90;--card-accent:#8cbace}
+:root[data-theme=dark] .schematic-node[data-tone="2"]{--card-background:#203b39;--card-border:#568a81;--card-accent:#8dc8bf}
+:root[data-theme=dark] .schematic-node[data-tone="3"]{--card-background:#2c3b2e;--card-border:#6d8b67;--card-accent:#abc59d}
+:root[data-theme=dark] .schematic-node[data-tone="4"]{--card-background:#3b3828;--card-border:#8b8257;--card-accent:#d2c288}
+:root[data-theme=dark] .schematic-node[data-tone="5"]{--card-background:#403229;--card-border:#99765e;--card-accent:#d7ae91}
+:root[data-theme=dark] .schematic-node[data-tone="6"]{--card-background:#3f2f3a;--card-border:#96758b;--card-accent:#cca2bb}
+:root[data-theme=dark] .schematic-node[data-tone="7"]{--card-background:#342f42;--card-border:#83759c;--card-accent:#b9a8d6}
+:root[data-theme=dark] .schematic-node-name{fill:var(--ui-text)}
+:root[data-theme=dark] :is(.schematic-node-code,.schematic-node-space,.schematic-node-metric,.schematic-column){fill:#b5c8c9}
+:root[data-theme=dark] .schematic-empty{color:var(--ui-muted)}

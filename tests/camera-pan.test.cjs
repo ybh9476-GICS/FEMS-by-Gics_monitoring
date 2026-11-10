@@ -41,6 +41,91 @@ test('건물 확대는 현재 3D·평면도 회전각을 유지하고 가까이 
     scene.fit();assert.equal(scene.yaw,.6);assert.equal(scene.pitch,.77);assert.equal(scene.planYaw,0);
   }
 });
+test('건물·층 포커싱은 화면 비율·회전·대상 크기에 맞춰 화면을 채우고 모서리를 자르지 않는다',()=>{
+  for(const mode of ['3d','plan'])for(const aspect of [.45,1,2.8])for(const yaw of [-1.2,.6,2.4])for(const pitch of [.2,.77,1.4])for(const size of [[4,3,2],[80,6,3],[20,16,65]])for(const floor of [false,true]){
+    const {scene}=fixture(mode),[width,depth,height]=size;
+    Object.assign(scene,{width:700*aspect,yaw,planYaw:yaw,pitch,radius:10000});scene.perspective.aspect=aspect;
+    scene.state.site={width,depth};scene.state.equipment=[{x:0,z:0,y:-2,height:height+2}];
+    if(floor)scene.state.scopeFloorId='floor';else scene.state.focusBounds={x:0,z:0,width,depth,low:-2,high:height};
+    const before=JSON.stringify(scene.state);scene.fit({preserveAngle:true});
+    let extent=0;
+    for(const x of [-width/2,width/2])for(const z of [-depth/2,depth/2])for(const y of [-2,height]){
+      const p=new T.Vector3(x,y,z).project(scene.camera);extent=Math.max(extent,Math.abs(p.x),Math.abs(p.y));
+      assert.ok(Math.abs(p.x)<=.840001&&Math.abs(p.y)<=.840001&&p.z>=-1&&p.z<=1,JSON.stringify({mode,aspect,yaw,pitch,size,floor,p}));
+    }
+    assert.ok(extent>.83999);assert.equal(JSON.stringify(scene.state),before);
+  }
+});
+
+test('관제 설비 포커싱은 표시 위치를 중심으로 적당히 확대하고 시점·가까운 배율·데이터를 보존한다',()=>{
+  for(const mode of ['3d','plan'])for(const aspect of [.55,1.5])for(const size of [2,40]){
+    const {scene}=fixture(mode);scene.readOnly=true;scene.radius=1000;
+    scene.width=scene.height*aspect;scene.perspective.aspect=aspect;
+    scene.yaw=-1.2;scene.planYaw=.8;scene.pitch=.35;
+    const item=scene.state.equipment[0];Object.assign(item,{x:36,z:-22,y:18,width:size,depth:size/2,height:size,rotation:37});
+    const before=JSON.stringify(scene.state);scene.updateCamera();
+    const direction=scene.camera.getWorldDirection(new T.Vector3());
+    scene.focusEquipment(item.id,{animate:false});
+    assert.deepEqual([scene.target.x,scene.target.y,scene.target.z],[36,18+size/2,-22]);
+    assert.ok(scene.radius<1000);assert.ok(scene.radius>=(mode==='plan'?20:28));
+    assert.ok(direction.distanceTo(scene.camera.getWorldDirection(new T.Vector3()))<1e-6);
+    for(const x of [-size/2,size/2])for(const z of [-size/4,size/4])for(const y of [0,size]){
+      const p=new T.Vector3(x,0,z).applyAxisAngle(new T.Vector3(0,1,0),37*Math.PI/180).add(new T.Vector3(36,18+y,-22)).project(scene.camera);
+      assert.ok(Math.abs(p.x)<.8&&Math.abs(p.y)<.8,JSON.stringify({mode,aspect,size,p}));
+    }
+    scene.radius=9;scene.focusEquipment(item.id,{animate:false});assert.equal(scene.radius,9);
+    assert.equal(scene.yaw,-1.2);assert.equal(scene.planYaw,.8);assert.equal(scene.pitch,.35);
+    assert.equal(JSON.stringify(scene.state),before);
+    scene.target.set(1,2,3);scene.focusEquipment('missing');assert.deepEqual([...scene.target.toArray()],[1,2,3]);
+    scene.readOnly=false;scene.focusEquipment(item.id,{animate:false});assert.deepEqual([...scene.target.toArray()],[1,2,3]);
+  }
+});
+
+test('3D·평면도 포커싱은 실제 렌더 프레임마다 보간하고 약 0.5초 후 정확히 정지한다',()=>{
+  const original=context.requestAnimationFrame;
+  try{for(const mode of ['3d','plan']){
+    const {scene}=fixture(mode),queue=[],frames=[];context.requestAnimationFrame=fn=>queue.push(fn);
+    scene.readOnly=true;scene.radius=100;Object.assign(scene.state.equipment[0],{x:24,z:-12,y:8});
+    scene.host.clientWidth=900;scene.host.clientHeight=700;
+    scene.floorShadows={update(){}};scene.updateGizmo=scene.updateHoverVisual=scene.updateLabels=()=>{};
+    scene.renderer.render=()=>frames.push({x:scene.target.x,radius:scene.radius});
+    scene.invalidate=Scene.prototype.invalidate;
+    const before=JSON.stringify(scene.state);scene.focusEquipment('test');
+    assert.equal(scene.target.x,0);assert.equal(scene.radius,100);assert.equal(queue.length,1);
+    for(const time of [1000,1120,1240,1360,1480])queue.shift()(time);
+    assert.equal(frames[0].x,0);assert.equal(frames[0].radius,100);
+    for(let i=1;i<frames.length;i++){assert.ok(frames[i].x>frames[i-1].x);assert.ok(frames[i].radius<frames[i-1].radius);}
+    assert.equal(frames[2].x,12);assert.deepEqual([...scene.target.toArray()],[24,9,-12]);
+    assert.equal(scene.radius,mode==='plan'?20:28);assert.equal(scene.focusAnimation,null);
+    while(queue.length)queue.shift()(1600);assert.equal(queue.length,0);
+    assert.equal(scene.yaw,.6);assert.equal(scene.pitch,.77);assert.equal(scene.planYaw,0);assert.equal(JSON.stringify(scene.state),before);
+  }}finally{context.requestAnimationFrame=original;}
+});
+
+test('포커싱 재선택은 현재 위치에서 이어지고 수동 조작·모드 전환은 자동 이동을 취소한다',()=>{
+  for(const mode of ['3d','plan']){
+    const {scene,listeners}=fixture(mode);scene.readOnly=true;
+    Object.assign(scene.state.equipment[0],{x:20,z:10});scene.state.equipment.push({...scene.state.equipment[0],id:'other',x:-20});
+    scene.focusEquipment('test');scene.updateFocusAnimation(0);scene.updateFocusAnimation(240);
+    const mid=scene.target.clone(),radius=scene.radius;
+    scene.focusEquipment('other');assert.equal(scene.target.distanceTo(mid),0);assert.equal(scene.radius,radius);
+    scene.updateFocusAnimation(500);scene.updateFocusAnimation(980);assert.equal(scene.target.x,-20);
+    scene.setHover=scene.updateGizmo=scene.setArmed=scene.resize=()=>{};
+    for(const action of [()=>scene.zoom(.9),()=>scene.pan(10,5),()=>scene.fit(),()=>scene.setMode(mode==='3d'?'plan':'3d'),()=>scene.setReadOnly(false),()=>listeners.pointerdown({button:0,pointerId:1,clientX:500,clientY:400})]){
+      scene.readOnly=true;scene.focusEquipment('test');scene.updateFocusAnimation(0);scene.updateFocusAnimation(120);
+      action();assert.equal(scene.focusAnimation,null);
+      const stopped=scene.target.clone(),stoppedRadius=scene.radius;scene.updateFocusAnimation(1000);
+      assert.equal(scene.target.distanceTo(stopped),0);assert.equal(scene.radius,stoppedRadius);
+    }
+  }
+});
+
+test('동작 줄이기 설정에서는 포커싱 애니메이션 없이 목적지로 이동한다',()=>{
+  const original=context.matchMedia;context.matchMedia=()=>({matches:true});
+  try{const {scene}=fixture('3d');scene.readOnly=true;scene.state.equipment[0].x=30;scene.focusEquipment('test');assert.equal(scene.target.x,30);assert.equal(scene.radius,28);assert.equal(scene.focusAnimation,null);}
+  finally{context.matchMedia=original;}
+});
+
 test('외부 연결 빌보드는 끝점에 투영되고 클릭·숨김·공간 변경을 처리한다',()=>{
   const original=context.document;
   context.document={createElement(){return {style:{},dataset:{},events:{},addEventListener(k,fn){this.events[k]=fn;},setAttribute(){},remove(){this.removed=true;}};}};
@@ -119,6 +204,68 @@ function fixture(mode) {
   return { scene, listeners };
 }
 
+for(const mode of ['3d','plan'])test(`${mode}: 관제 빌보드는 기본·호버·선택 상태에 따라 확장하며 드래그·편집 복귀와 데이터를 보존한다`,()=>{
+  const original=context.document;
+  function element(){return {children:[],style:{},attrs:{},classes:new Set(),offsetWidth:148,offsetHeight:90,
+    classList:{toggle(name,on){if(on)this.owner.classes.add(name);else this.owner.classes.delete(name);}},
+    setAttribute(k,v){this.attrs[k]=v;},append(...children){this.children.push(...children);},
+    replaceChildren(...children){this.children=children;this.text='';},
+    get textContent(){return this.children.length?this.children.map(c=>c.textContent).join(''):this.text||'';},
+    set textContent(value){this.text=value;this.children=[];},
+    getBoundingClientRect(){return {left:180,right:356,top:100,bottom:228};}};}
+  context.document={createElement(){const node=element();node.classList.owner=node;return node;}};
+  try{
+    const {scene,listeners}=fixture(mode),label=context.document.createElement(),item=scene.state.equipment[0];
+    item.name='<설비 이름>';scene.labels=new Map([[item.id,label]]);scene.showLabels=true;scene.readOnly=true;scene.ghost={visible:false};
+    scene.handlers.selectLabel=id=>{scene.selected=id;};
+    const before=JSON.stringify(scene.state),event={button:0,pointerId:1,clientX:200,clientY:200};
+    scene.updateLabels();assert.equal(label.textContent,item.name);
+    assert.equal(label.equipmentInfo.status.className,'communication-status communication-status-disconnected');
+    assert.equal(label.equipmentInfo.status.attrs['aria-label'],'통신 연결 끊김');
+    for(const [reported,expected,caption] of [['normal','normal','통신 정상'],['error','error','통신 에러'],['disconnected','disconnected','통신 연결 끊김'],['unknown','disconnected','통신 연결 끊김']]){
+      scene.handlers.communicationStatus=id=>{assert.equal(id,item.id);return reported;};scene.updateLabels();
+      assert.equal(label.equipmentInfo.status.className,'communication-status communication-status-'+expected);
+      assert.equal(label.equipmentInfo.status.attrs['title'],caption);assert.equal(label.textContent,item.name);
+    }
+    delete scene.handlers.communicationStatus;
+    listeners.pointermove(event);scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));assert.equal(scene.selected,undefined);
+    // Moving inside the expanded card keeps it open without selecting equipment.
+    listeners.pointermove({...event,clientX:300});scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
+    listeners.pointermove({...event,clientX:500});scene.updateLabels();assert.equal(label.textContent,item.name);
+    // Hovering the equipment model also opens its billboard.
+    scene.pick=()=>item.id;listeners.pointermove({...event,clientX:500});scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));scene.pick=()=>null;
+    listeners.pointerleave();scene.updateLabels();assert.equal(label.textContent,item.name);
+    listeners.pointerdown(event);listeners.pointerup(event);scene.updateLabels();
+    assert.ok(label.classes.has('equipment-info-open'));assert.equal(label.children[0].textContent,item.name);
+    assert.deepEqual(label.children[1].children.map(c=>c.textContent),['전압(V)','—','전류(A)','—','유효전력(kW)','—','역률(pF)','—']);
+    listeners.pointerleave();scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
+    scene.selected=null;listeners.pointermove(event);scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
+    listeners.pointerleave();scene.updateLabels();assert.equal(label.textContent,item.name);scene.selected=item.id;
+    const camera=scene.target.clone();listeners.pointerdown(event);listeners.pointermove({...event,clientX:260});listeners.pointerup({...event,clientX:260});
+    assert.ok(camera.distanceTo(scene.target)>0);assert.equal(scene.committedMove,undefined);assert.equal(JSON.stringify(scene.state),before);
+    scene.showLabels=false;scene.updateLabels();assert.equal(label.hidden,true);
+    scene.showLabels=true;scene.selected=null;scene.updateLabels();assert.equal(label.textContent,item.name);assert.ok(!label.classes.has('equipment-info-open'));
+    scene.selected=item.id;scene.readOnly=false;scene.updateLabels();assert.equal(label.textContent,item.name);
+    scene.readOnly=true;scene.state.buildings=[{id:item.id}];scene.updateLabels();assert.equal(label.textContent,item.name);
+    scene.state.buildings=[];scene.state.floors=[{id:item.id}];scene.updateLabels();assert.equal(label.textContent,item.name);
+    scene.state.floors=[];scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
+    item.name='변경된 이름';scene.updateLabels();assert.equal(label.children[0].textContent,item.name);
+    // Reusing the label after an equipment type change must not retain old rows.
+    const expected={tower:['계약 전력','유효 전력','부하율'],solar:['일간 발전량','일간 발전 시간','입력 전력','출력 전력'],ess:['일간 충전량','일간 방전량','일간 효율'],ups:['입력','출력','배터리','유효전력'],panel:['전압(V)','전류(A)','유효전력(kW)','역률(pF)']};
+    for(const type of ['tower','solar','solar-2x2','solar-3x3','ess','ups','panel']){
+      item.type=type;const snapshot=JSON.stringify(scene.state),captions=expected[type]||expected.solar;
+      scene.selected=null;scene.hovered=null;scene.updateLabels();assert.equal(label.textContent,item.name);
+      scene.hovered=item.id;scene.updateLabels();
+      assert.deepEqual(label.equipmentInfo.values.children.map(c=>c.textContent),captions.flatMap(c=>[c,'—']));
+      assert.ok(label.equipmentInfo.values.children.filter((c,i)=>i%2===0).every(c=>c.attrs['data-i18n-ui']===''));
+      scene.hovered=null;scene.selected=item.id;scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
+      assert.equal(label.equipmentInfo.status.className,'communication-status communication-status-disconnected');
+      assert.equal(JSON.stringify(scene.state),snapshot);
+    }
+    assert.ok(parseFloat(label.style.left)>=label.offsetWidth/2+4);assert.ok(parseFloat(label.style.top)>=label.offsetHeight+4);
+  }finally{context.document=original;}
+});
+
 test('평면도 이름표는 회전·줌·이동 중에도 설비 상단과 4px 간격을 유지하고 3D 위치는 유지된다',()=>{
   const {scene}=fixture('plan'),item=scene.state.equipment[0],model=scene.models.get('test');
   Object.assign(item,{width:6,depth:2,name:'설비'});
@@ -170,6 +317,36 @@ for (const mode of ['plan', '3d']) {
     scene.pickGizmo=()=> 'x';assert.equal(scene.pickTarget(e).axis,'x');scene.pickGizmo=()=>null;
     label.hidden=true;assert.equal(scene.pickLabel(e),null);label.hidden=false;scene.showLabels=false;assert.equal(scene.pickLabel(e),null);
     scene.showLabels=true;scene.armed='tower';assert.equal(scene.pickTarget(e).id,undefined);
+  });
+  test(`${mode}: 겹친 빌보드는 선택된 설비를 먼저 클릭하고 선택 해제 시 원래 순서를 복원한다`,()=>{
+    const {scene}=fixture(mode),rect=()=>({left:180,right:220,top:180,bottom:220});
+    const first={hidden:false,getBoundingClientRect:rect},last={hidden:false,getBoundingClientRect:rect};
+    scene.readOnly=true;scene.showLabels=true;scene.labels=new Map([['test',first],['other',last]]);
+    scene.state.equipment.push({...scene.state.equipment[0],id:'other'});
+    const event={clientX:200,clientY:200};
+    assert.equal(scene.pickLabel(event),'other');
+    scene.selected='test';assert.equal(scene.pickLabel(event),'test');
+    first.hidden=true;assert.equal(scene.pickLabel(event),'other');first.hidden=false;
+    scene.selected='other';assert.equal(scene.pickLabel(event),'other');
+    scene.selected=null;scene.selectedIds=['test'];assert.equal(scene.pickLabel(event),'test');
+    scene.selectedIds=['test','other'];assert.equal(scene.pickLabel(event),'other');
+    scene.selectedIds=[];assert.equal(scene.pickLabel(event),'other');
+    scene.selected='test';scene.readOnly=false;assert.equal(scene.pickLabel(event),'other');
+  });
+  test(`${mode}: 앞쪽 관제 카드의 클릭·드래그·휠은 뒤쪽 링크 대신 장면에서 처리한다`,()=>{
+    const {scene,listeners}=fixture(mode),surface={};
+    scene.labelHost={addEventListener(type,handler){surface[type]=handler;}};scene.bind();
+    scene.readOnly=true;scene.selected='test';scene.showLabels=true;
+    scene.labels=new Map([['test',{hidden:false,getBoundingClientRect:()=>({left:180,right:220,top:180,bottom:220})}]]);
+    const event={button:0,pointerId:1,clientX:200,clientY:200,target:{closest:()=>({})},preventDefault(){}};
+    let selected=null;scene.handlers.selectLabel=id=>selected=id;
+    surface.pointerdown(event);listeners.pointerup(event);assert.equal(selected,'test');
+    const before=JSON.stringify(scene.state),target=scene.target.clone();
+    surface.pointerdown(event);listeners.pointermove({...event,clientX:260});listeners.pointerup({...event,clientX:260});
+    assert.ok(scene.target.distanceTo(target)>0);assert.equal(JSON.stringify(scene.state),before);
+    const radius=scene.radius;surface.wheel({...event,deltaY:-1});assert.ok(scene.radius<radius);
+    selected=null;surface.pointerdown({...event,target:{closest:()=>null}});assert.equal(scene.drag,null);
+    scene.readOnly=false;surface.pointerdown(event);assert.equal(scene.drag,null);
   });
   test(`${mode}: 우클릭은 3D에서만 회전하고 평면도에서는 무시한다`, () => {
     const { scene, listeners } = fixture(mode);

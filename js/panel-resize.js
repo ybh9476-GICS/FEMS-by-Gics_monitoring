@@ -65,7 +65,9 @@
     });
   }
   window.addEventListener('blur', () => finish());
+  window.addEventListener('fems-workspace-mode-changing', () => finish(true));
   new ResizeObserver(() => {
+    if (document.body.dataset.workspaceMode === 'monitoring') return;
     if (!desktop.matches) { finish(); return; }
     // Keep enough canvas space when the browser window becomes narrower.
     resize('left', width('left'));

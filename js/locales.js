@@ -24,7 +24,96 @@
 층 ID¦Floor ID¦フロアID
 프로젝트 ID¦Project ID¦プロジェクトID
 작업 모드 (작업 중)¦Workspace mode (In progress)¦作業モード（準備中）
-화면 테마 (작업 중)¦Theme (In progress)¦画面テーマ（準備中）
+작업 모드¦Workspace mode¦作業モード
+관제 대시보드¦Monitoring dashboard¦モニタリングダッシュボード
+통합 대시보드¦Integrated dashboard¦統合ダッシュボード
+ESS 대시보드 예시 · 좌우 스크롤¦Sample ESS dashboard · Scroll horizontally¦ESSダッシュボードの例・横スクロール
+충전량 (일/월)¦Charge energy (day/month)¦充電量（日/月）
+방전량 (일/월)¦Discharge energy (day/month)¦放電量（日/月）
+전력변환장치¦Power conversion system¦電力変換装置
+배터리 관리장치¦Battery management system¦バッテリー管理装置
+방전¦Discharging¦放電
+계통정보¦Grid data¦系統情報
+전압 [V]¦Voltage [V]¦電圧 [V]
+전류 [A]¦Current [A]¦電流 [A]
+온도 [°C]¦Temperature [°C]¦温度 [°C]
+주파수 [Hz] / 역률¦Frequency [Hz] / PF¦周波数 [Hz] / 力率
+배터리 충전 상태 76.5%¦Battery state of charge 76.5%¦バッテリー充電状態76.5%
+PCS 1 계통정보¦PCS 1 grid data¦PCS 1系統情報
+BMS 1 배터리 상태¦BMS 1 battery status¦BMS 1バッテリー状態
+수용가 정보 / 절감액¦Customer information / Savings¦需要家情報 / 削減額
+수용가 정보¦Customer information¦需要家情報
+요금 종류¦Tariff type¦料金種別
+산업용(을) 고압 A 선택 III¦Industrial (B), high-voltage A, option III¦産業用（乙）高圧A選択III
+ESS 절감액¦ESS savings¦ESS削減額
+총 발전 절감액¦Total generation savings¦総発電削減額
+일일¦Daily¦日間
+주간¦Weekly¦週間
+월간¦Monthly¦月間
+UPS 대시보드 예시 · 좌우 스크롤¦Sample UPS dashboard · Scroll horizontally¦UPSダッシュボードの例・横スクロール
+유틸리티 동¦Utility building¦ユーティリティ棟
+경보¦Alarm¦警報
+기타¦Other¦その他
+태양광 대시보드 예시 · 좌우 스크롤¦Sample solar dashboard · Scroll horizontally¦太陽光ダッシュボードの例・横スクロール
+발전량 현황¦Generation overview¦発電状況
+인버터별 발전 현황¦Generation by inverter¦インバーター別発電状況
+일 누적 발전량¦Daily generation total¦日積算発電量
+일 최대 출력전력¦Daily peak output¦日最大出力電力
+인버터¦Inverter¦インバーター
+운전 상태¦Operating status¦運転状態
+현재 출력 전력¦Current output power¦現在の出力電力
+발전 효율¦Generation efficiency¦発電効率
+운전 중¦Running¦運転中
+데이터 없음¦No data¦データなし
+태양광 300 kW 인버터별 발전 현황 · 예시 데이터¦Solar 300 kW generation by inverter · Sample data¦太陽光300 kWインバーター別発電状況・サンプルデータ
+예시 데이터¦Sample data¦サンプルデータ
+대시보드 왼쪽으로 이동¦Scroll dashboard left¦ダッシュボードを左へ
+대시보드 오른쪽으로 이동¦Scroll dashboard right¦ダッシュボードを右へ
+통합 대시보드 예시 · 좌우 스크롤¦Sample integrated dashboard · Scroll horizontally¦統合ダッシュボードの例・横スクロール
+실시간 전력¦Live power¦リアルタイム電力
+피크 전력¦Peak power¦ピーク電力
+발생시간¦Recorded at¦発生時刻
+시간대별 전력 소비량¦Hourly consumption¦時間帯別電力消費量
+금일 총 사용량¦Today's total¦本日の総使用量
+금일 사용량 (kWh)¦Today (kWh)¦本日 (kWh)
+전일 사용량 (kWh)¦Yesterday (kWh)¦前日 (kWh)
+당일 전기 사용량¦Daily electricity use¦当日電力使用量
+당일 전기 요금¦Daily electricity cost¦当日電気料金
+전주 평균 대비 (00–16시)¦vs. last week (00–16h)¦前週平均比 (00–16時)
+작년 동일 대비 (00–16시)¦vs. last year (00–16h)¦前年同日比 (00–16時)
+온실가스 누적배출량¦Cumulative emissions¦温室効果ガス累積排出量
+당일¦Today¦当日
+평균¦Average¦平均
+최대¦Maximum¦最大
+금년¦This year¦今年
+당월¦This month¦当月
+전월¦Last month¦前月
+천원¦KRW 1,000¦千ウォン
+태양광¦Solar¦太陽光
+객체 상세정보¦Object details¦オブジェクトの詳細
+전압(V)¦Voltage (V)¦電圧(V)
+전류(A)¦Current (A)¦電流(A)
+유효전력(kW)¦Active power (kW)¦有効電力(kW)
+역률(pF)¦Power factor (pF)¦力率(pF)
+계약 전력¦Contract power¦契約電力
+유효 전력¦Active power¦有効電力
+부하율¦Load factor¦負荷率
+일간 발전량¦Daily generation¦日間発電量
+일간 발전 시간¦Daily generation hours¦日間発電時間
+입력 전력¦Input power¦入力電力
+출력 전력¦Output power¦出力電力
+일간 충전량¦Daily charge energy¦日間充電量
+일간 방전량¦Daily discharge energy¦日間放電量
+일간 효율¦Daily efficiency¦日間効率
+입력¦Input¦入力
+출력¦Output¦出力
+배터리¦Battery¦バッテリー
+유효전력¦Active power¦有効電力
+통신 정상¦Communication normal¦通信正常
+통신 에러¦Communication error¦通信エラー
+통신 연결 끊김¦Communication disconnected¦通信切断
+파일 작업이 끝난 뒤 모드를 전환하세요.¦Switch modes after the file operation finishes.¦ファイル操作が完了してからモードを切り替えてください。
+화면 테마¦Theme¦画面テーマ
 언어 선택¦Language¦言語選択
 Editor Mode¦Editor Mode¦編集モード
 Monitoring Mode¦Monitoring Mode¦モニタリングモード

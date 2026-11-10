@@ -24,6 +24,7 @@
       this.svg.addEventListener('keydown',e=>{if(e.target!==this.svg||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();this.offset.x+=e.key==='ArrowLeft'?40:e.key==='ArrowRight'?-40:0;this.offset.y+=e.key==='ArrowUp'?40:e.key==='ArrowDown'?-40:0;this.transform();});
       new ResizeObserver(()=>{if(this.active){if(!this.fitted)this.fit(true);else this.transform();}}).observe(this.canvas);
     }
+    setReadOnly(value){this.readOnly=!!value;this.edge=null;this.key=null;if(this.active)this.draw();}
     setActive(active){this.active=active;this.host.hidden=!active;if(active){this.draw();if(!this.fitted)this.fit(true);}}
     setState(state,selected){this.state=state;const changed=this.selected!==selected;if(changed)this.edge=null;this.selected=selected;if(this.active){this.draw();if(changed)this.reveal();}}
     draw(){
@@ -33,15 +34,37 @@
       if(key!==this.key){this.key=key;this.layout=L.layout(filtered);this.svg.replaceChildren();const defs=svg('defs');for(const color of new Set(this.layout.edges.flatMap(e=>e.bands.map(b=>b.color)))){const marker=svg('marker',{id:'schematic-arrow-'+color.slice(1),viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'});marker.append(svg('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:color}));defs.append(marker);}this.svg.append(defs);this.world=svg('g');this.svg.append(this.world);this.edgeElements=new Map();this.nodeElements=new Map();
         for(let rank=0;rank<this.layout.columns;rank++)this.world.append(svg('text',{x:32+rank*346,y:Math.min(...this.layout.nodes.filter(n=>n.rank===rank).map(n=>n.y))-16,class:'schematic-column'},'연결 단계 '+(rank+1)));
         const names=new Map(graph.nodes.map(n=>[n.id,n.name]));
-        for(const e of this.layout.edges){const group=svg('g',{'data-edge':e.id,class:'schematic-edge '+e.kind,tabindex:0,role:'button','aria-label':names.get(e.from)+' → '+names.get(e.to)+' · '+(e.kind==='hierarchy'?'계층 연결':'추가 연결')});group.append(svg('title',{},group.getAttribute('aria-label')),svg('path',{d:e.path,class:'schematic-edge-hit'}));const parts=L.coloredSegments(e.points,e.bands);parts.forEach((part,index)=>group.append(svg('path',{d:part.path,class:'schematic-edge-line',stroke:part.color,'stroke-dashoffset':-part.offset,...(index===parts.length-1?{'marker-end':'url(#schematic-arrow-'+part.color.slice(1)+')'}:{})})));
-          const choose=()=>{if(this.moved){this.moved=false;return;}this.edge=e.id;this.highlight();};group.addEventListener('click',choose);group.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();this.moved=false;choose();}});this.world.append(group);this.edgeElements.set(e.id,group);}
-        for(const n of this.layout.nodes){const systemSite=this.state.site.name===undefined&&!this.state.floors?.find(f=>f.id===this.state.equipment.find(e=>e.id===n.id)?.floorId)?.buildingId;const g=svg('g',{transform:`translate(${n.x} ${n.y})`,'data-node':n.id,'data-stage':n.rank+1,'data-tone':n.rank%8,class:'schematic-node',...(systemSite?{'data-i18n-site-suffix':n.space}:{}),tabindex:0,role:'button','aria-label':n.name+' · '+n.space});g.append(nodeTitle(n,systemSite),svg('rect',{class:'schematic-card',width:n.width,height:n.height,rx:10}),svg('rect',{class:'schematic-card-accent',x:6,y:10,width:4,height:n.height-20,rx:2,'aria-hidden':true}),svg('text',{x:18,y:25,class:'schematic-node-name'},this.shorten(n.name,22)),svg('text',{x:18,y:47,class:'schematic-node-code',...(n.code||root.FEMSCatalog.get(n.type).custom?{'data-i18n-skip':''}:{})},this.shorten(n.code||root.FEMSCatalog.get(n.type).name,29)),svg('text',{x:18,y:69,class:'schematic-node-space',...(this.state.site.name===undefined&&!this.state.floors?.find(f=>f.id===this.state.equipment.find(e=>e.id===n.id)?.floorId)?.buildingId?{'data-i18n-site-path':''}:{})},this.shorten(n.space,28)));
+        for(const e of this.layout.edges){const group=svg('g',{'data-edge':e.id,class:'schematic-edge '+e.kind,tabindex:this.readOnly?-1:0,role:'button','aria-label':names.get(e.from)+' → '+names.get(e.to)+' · '+(e.kind==='hierarchy'?'계층 연결':'추가 연결')});group.append(svg('title',{},group.getAttribute('aria-label')),svg('path',{d:e.path,class:'schematic-edge-hit'}));const parts=L.coloredSegments(e.points,e.bands);parts.forEach((part,index)=>group.append(svg('path',{d:part.path,class:'schematic-edge-line',stroke:part.color,'stroke-dashoffset':-part.offset,...(index===parts.length-1?{'marker-end':'url(#schematic-arrow-'+part.color.slice(1)+')'}:{})})));
+          const choose=()=>{if(this.readOnly)return;if(this.moved){this.moved=false;return;}this.edge=e.id;this.highlight();};group.addEventListener('click',choose);group.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();this.moved=false;choose();}});this.world.append(group);this.edgeElements.set(e.id,group);}
+        for(const n of this.layout.nodes){const g=this.createCard(n);
           const choose=()=>{this.edge=null;this.api.select(n.id);this.nodeElements.get(n.id)?.focus({preventScroll:true});};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();choose();}});this.world.append(g);this.nodeElements.set(n.id,g);}
         this.transform();
       }
       this.empty.hidden=filtered.nodes.length>0;this.empty.textContent=graph.nodes.length?'검색 조건에 맞는 설비가 없습니다. 검색어를 바꾸거나 직접 연결 필터를 해제하세요.':'등록된 설비가 없습니다. 3D View 또는 평면도에서 설비를 배치하세요.';
       if(!this.layout.edges.some(e=>e.id===this.edge))this.edge=null;
-      this.highlight();
+      this.updateCommunication();this.highlight();
+    }
+    createCard(n){
+      const systemSite=this.state.site.name===undefined&&!this.state.floors?.find(f=>f.id===this.state.equipment.find(e=>e.id===n.id)?.floorId)?.buildingId;
+      const g=svg('g',{transform:`translate(${n.x} ${n.y})`,'data-node':n.id,'data-stage':n.rank+1,'data-tone':n.rank%8,class:'schematic-node',...(!this.readOnly&&systemSite?{'data-i18n-site-suffix':n.space}:{}),tabindex:0,role:'button','aria-label':this.readOnly?n.name:n.name+' · '+n.space});
+      g.append(this.readOnly?svg('title',{'data-i18n-skip':''},n.name):nodeTitle(n,systemSite),svg('rect',{class:'schematic-card',width:n.width,height:n.height,rx:10}),svg('rect',{class:'schematic-card-accent',x:6,y:10,width:4,height:n.height-20,rx:2,'aria-hidden':true}),svg('text',{x:18,y:this.readOnly?22:25,class:'schematic-node-name'},this.shorten(n.name,22)));
+      if(this.readOnly){
+        // Match the billboard until live measurements are connected.
+        ['전압(V)','전류(A)','유효전력(kW)','역률(pF)'].forEach((caption,index)=>{
+          const y=42+index*12;
+          g.append(svg('text',{x:18,y:y-3,class:'schematic-node-metric','data-i18n-ui':''},caption),svg('text',{x:n.width-16,y,class:'schematic-node-metric','text-anchor':'end'},'—'));
+        });
+      }else{
+        g.append(svg('text',{x:18,y:47,class:'schematic-node-code',...(n.code||root.FEMSCatalog.get(n.type).custom?{'data-i18n-skip':''}:{})},this.shorten(n.code||root.FEMSCatalog.get(n.type).name,29)),svg('text',{x:18,y:69,class:'schematic-node-space',...(systemSite?{'data-i18n-site-path':''}:{})},this.shorten(n.space,28)));
+      }
+      return g;
+    }
+    updateCommunication(){
+      if(!this.readOnly)return;
+      for(const [id,g] of this.nodeElements){
+        const reported=this.api.communicationStatus?.(id),status=reported==='normal'||reported==='error'?reported:'disconnected';
+        g.setAttribute('data-communication-status',status);
+      }
     }
     shorten(text,max){let result='',width=0;for(const char of Array.from(text)){width+=char.codePointAt(0)>255?2:1;if(width>max)return result+'…';result+=char;}return result;}
     highlight(){

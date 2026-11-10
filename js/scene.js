@@ -1,6 +1,12 @@
 (function (root) {
   'use strict';
   const T=root.THREE, M=root.FEMSModel;
+  const billboardMetrics={
+    tower:['계약 전력','유효 전력','부하율'],
+    solar:['일간 발전량','일간 발전 시간','입력 전력','출력 전력'],
+    ess:['일간 충전량','일간 방전량','일간 효율'],
+    ups:['입력','출력','배터리','유효전력']
+  };
   class Scene {
     constructor(host, labels, handlers, rotateButton = null) {
       this.host=host;this.labelHost=labels;this.handlers=handlers;this.models=new Map();this.labels=new Map();this.footprints=new Map();
@@ -38,6 +44,7 @@
       });
     }
     setState(state, selected, warnings, selectedIds=selected?[selected]:[]) {
+      if(this.focusAnimation&&(this.focusAnimation.id!==selected||!state.equipment.some(e=>e.id===selected)))this.cancelFocus();
       this.state=state;this.selected=selected;this.selectedIds=selectedIds;this.warnings=warnings;
       const groundSite=state.site,siteKey=JSON.stringify(groundSite);
       if(siteKey!==this.siteKey){this.siteKey=siteKey;if(this.ground){this.scene.remove(this.ground);root.FEMSEquipment.dispose(this.ground);}
@@ -92,7 +99,8 @@
         box.box.setFromObject(object);box.box.expandByScalar(.09);
       }
     }
-    setMode(mode){if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.lastPointer=null;this.mode=mode;if(mode==='plan')this.planYaw=0;this.camera=mode==='plan'?this.ortho:this.perspective;this.models.forEach(m=>m.visible=mode==='3d');this.footprints.forEach(m=>m.visible=mode==='plan');this.resize();this.updateSelection();}
+    setMode(mode){this.cancelFocus();if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.lastPointer=null;this.mode=mode;if(mode==='plan')this.planYaw=0;this.camera=mode==='plan'?this.ortho:this.perspective;this.models.forEach(m=>m.visible=mode==='3d');this.footprints.forEach(m=>m.visible=mode==='plan');this.resize();this.updateSelection();}
+    setReadOnly(value){this.cancelFocus();if(this.drag)this.cancelDrag();if(value)this.setArmed(null);this.readOnly=!!value;this.connectionSelection=null;this.connectionGuides={};this.cornerMode=false;this.setHover();this.updateGizmo();this.invalidate();}
     setArmed(type){if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.armed=type;this.ghost.visible=false;this.updateCursor();this.invalidate();}
     transformItem(){
       const single=this.state?.equipment.find(e=>e.id===this.selected);
@@ -110,7 +118,7 @@
     updateGizmo(){
       if(!this.gizmo)return;
       const item=this.transformItem();
-      this.gizmo.update(item, item?.id==='@selection'?item:this.models.get(this.selected)?.position, this.camera, this.height, !this.armed&&!item?.backdrop&&!item?.noGizmo);
+      this.gizmo.update(item, item?.id==='@selection'?item:this.models.get(this.selected)?.position, this.camera, this.height, !this.readOnly&&!this.armed&&!item?.backdrop&&!item?.noGizmo);
       if(this.gizmo.rotateButton)this.gizmo.rotateButton.disabled=!!this.drag;
       this.gizmo.highlight(this.drag?.axis||this.hoverAxis);
       if(this.connectionGizmo){
@@ -118,12 +126,13 @@
         const a=line?.points[selection?.index],b=line?.points[selection?.index+1];
         const point=!line?.crossSpace?null:selection.kind==='point'?(!root.FEMSConnections.isLocked(line,selection.index)?a:null):b?Object.fromEntries(['x','y','z'].map(k=>[k,(a[k]+b[k])/2])):null;
         this.connectionGizmo.axes.get('y').arrow.visible=this.mode!=='plan';
-        this.connectionGizmo.update(point,point,this.camera,this.height,!this.armed);
+        this.connectionGizmo.update(point,point,this.camera,this.height,!this.readOnly&&!this.armed);
         this.connectionGizmo.highlight(this.drag?.connection?.axis||this.hoverLink?.axis);
       }
     }
-    pickGizmo(event){if(!this.gizmo)return null;this.updateGizmo();this.setPointer(event);return this.gizmo.pick(this.ray);}
+    pickGizmo(event){if(this.readOnly||!this.gizmo)return null;this.updateGizmo();this.setPointer(event);return this.gizmo.pick(this.ray);}
     pickTarget(event){
+      if(this.readOnly){const label=this.pickLabel(event);return {id:label||this.pick(event),label:!!label};}
       if(this.armed)return {};
       // Alt is an explicit equipment override, including an overlapping gizmo.
       if(event.altKey){const label=this.pickLabel(event),id=label||this.pick(event);if(id)return {id,label:!!label};}
@@ -166,18 +175,65 @@
     updateCamera(){this.perspective.far=Math.max(600,this.radius*4+Math.hypot(this.state?.site.width||60,this.state?.site.depth||40)*2);this.perspective.near=Math.max(.01,this.radius/10000);this.perspective.updateProjectionMatrix();const aspect=(this.width||1)/(this.height||1);this.ortho.left=-this.radius*aspect/2;this.ortho.right=this.radius*aspect/2;this.ortho.top=this.radius/2;this.ortho.bottom=-this.radius/2;const levels=this.state?.equipment||[],top=Math.max(0,...levels.map(e=>(e.y||0)+e.height)),bottom=Math.min(0,...levels.map(e=>e.y||0));this.ortho.near=.01;this.ortho.far=Math.max(600,top-bottom+200);this.ortho.updateProjectionMatrix();this.ortho.position.set(this.target.x,Math.max(100,top+100),this.target.z);this.ortho.up.set(-Math.sin(this.planYaw),0,-Math.cos(this.planYaw));this.ortho.lookAt(this.target);
       this.perspective.position.set(this.target.x+this.radius*Math.sin(this.yaw)*Math.cos(this.pitch),this.target.y+this.radius*Math.sin(this.pitch),this.target.z+this.radius*Math.cos(this.yaw)*Math.cos(this.pitch));this.perspective.lookAt(this.target);this.camera.updateMatrixWorld();this.invalidate();}
     fit({preserveAngle=false,zoomInOnly=false}={}){
+      this.cancelFocus();
       const items=this.state?.equipment||[],focus=this.state?.focusBounds;
       const low=focus?.low??Math.min(0,...items.map(e=>e.y||0)),high=focus?.high??Math.max(0,...items.map(e=>(e.y||0)+e.height));
       this.target.set(focus?.x||0,(low+high)/2,focus?.z||0);
       if(!preserveAngle){this.yaw=.6;this.planYaw=0;this.pitch=.77;}
-      const margin=this.state?.scopeFloorId?8:0,width=(focus?.width||this.state?.site.width||60)+margin,depth=(focus?.depth||this.state?.site.depth||40)+margin,aspect=(this.width||1)/(this.height||1);
+      const spatial=!!(focus||this.state?.scopeFloorId),width=focus?.width||this.state?.site.width||60,depth=focus?.depth||this.state?.site.depth||40,aspect=(this.width||1)/(this.height||1);
       const halfFov=Math.atan(Math.tan(19*Math.PI/180)*Math.min(1,aspect));
       const c=Math.abs(Math.cos(this.planYaw)),s=Math.abs(Math.sin(this.planYaw));
-      const radius=this.mode==='plan'?Math.max((c*depth+s*width)*1.25,(c*width+s*depth)/aspect*1.25):Math.hypot(width,depth,high-low)/2/Math.sin(halfFov)*1.1;
+      let radius=this.mode==='plan'?Math.max((c*depth+s*width)*1.25,(c*width+s*depth)/aspect*1.25):Math.hypot(width,depth,high-low)/2/Math.sin(halfFov)*1.1;
+      if(spatial){
+        // Fit the actual box in the current view, leaving 8% padding on each screen edge.
+        const fill=.84;
+        if(this.mode==='plan')radius=Math.max(c*depth+s*width,(c*width+s*depth)/aspect)/fill;
+        else{
+          const cy=Math.cos(this.yaw),sy=Math.sin(this.yaw),cp=Math.cos(this.pitch),sp=Math.sin(this.pitch);
+          const tanY=Math.tan(this.perspective.fov*Math.PI/360)*fill,tanX=tanY*aspect;
+          radius=0;
+          for(const x of [-width/2,width/2])for(const y of [-(high-low)/2,(high-low)/2])for(const z of [-depth/2,depth/2]){
+            const horizontal=cy*x-sy*z,vertical=-sy*sp*x+cp*y-cy*sp*z,towardCamera=sy*cp*x+sp*y+cy*cp*z;
+            radius=Math.max(radius,towardCamera+Math.abs(horizontal)/tanX,towardCamera+Math.abs(vertical)/tanY);
+          }
+        }
+      }
       this.radius=zoomInOnly?Math.min(this.radius,radius):radius;this.updateCamera();
     }
-    zoom(direction){const size=Math.max(this.state?.site.width||60,this.state?.site.depth||40),aspect=(this.width||1)/(this.height||1);this.radius=Math.max(Math.min(7,size/2),Math.min(Math.max(500,size*10/Math.min(1,aspect)),this.radius*direction));this.updateCamera();}
+    focusEquipment(id,{animate=true}={}){
+      if(!this.readOnly)return;
+      const item=this.state?.equipment.find(e=>e.id===id);
+      if(!item||item.buildingShell||item.floorSelector||item.preview||item.backdrop)return;
+      // Display coordinates include the floor elevation and building offset.
+      const target=new T.Vector3(item.x,(item.y||0)+item.height/2,item.z);
+      const aspect=Math.min(1,(this.width||1)/(this.height||1));
+      const halfFov=Math.atan(Math.tan(this.perspective.fov*Math.PI/360)*aspect);
+      // Leave context around small equipment and space above it for its billboard.
+      const radius=this.mode==='plan'
+        ?Math.max(20,Math.hypot(item.width,item.depth)*2.5/aspect)
+        :Math.max(28,Math.hypot(item.width,item.depth,item.height)/2/Math.sin(halfFov)*1.7);
+      const endRadius=Math.min(this.radius,radius);
+      this.cancelFocus();
+      if(!animate||root.matchMedia?.('(prefers-reduced-motion: reduce)').matches){
+        this.target.copy(target);this.radius=endRadius;this.updateCamera();return;
+      }
+      this.focusAnimation={id,from:this.target.clone(),to:target,fromRadius:this.radius,toRadius:endRadius,start:null,duration:480};
+      this.invalidate();
+    }
+    cancelFocus(){this.focusAnimation=null;}
+    updateFocusAnimation(time){
+      const a=this.focusAnimation;if(!a)return;
+      a.start??=time;
+      const progress=Math.min(1,Math.max(0,(time-a.start)/a.duration)),ease=progress*progress*(3-2*progress);
+      this.target.lerpVectors(a.from,a.to,ease);
+      // A proportional zoom feels consistent for both near and distant equipment.
+      this.radius=progress===1?a.toRadius:a.fromRadius*Math.pow(a.toRadius/a.fromRadius,ease);
+      if(progress===1)this.cancelFocus();
+      this.updateCamera();
+    }
+    zoom(direction){this.cancelFocus();const size=Math.max(this.state?.site.width||60,this.state?.site.depth||40),aspect=(this.width||1)/(this.height||1);this.radius=Math.max(Math.min(7,size/2),Math.min(Math.max(500,size*10/Math.min(1,aspect)),this.radius*direction));this.updateCamera();}
     pan(dx, dy) {
+      this.cancelFocus();
       const factor = this.radius / (this.height || 600) * .8;
       const yaw = this.mode === 'plan' ? this.planYaw : this.yaw;
       // Move the camera opposite the drag so the scene follows the pointer.
@@ -205,8 +261,10 @@
     }
     pickLabel(event){
       // Labels stay pointer-transparent so camera drags and wheel zoom still reach the canvas.
-      // Reverse DOM order matches the label painted on top when labels overlap.
-      for(const [id,label] of Array.from(this.labels||[]).reverse()){
+      // Selected labels paint above their siblings; ties retain reverse DOM order.
+      const selected=new Set(this.readOnly?this.selectedIds||[]:[]);if(this.readOnly&&this.selected)selected.add(this.selected);
+      const labels=Array.from(this.labels||[]).reverse().sort((a,b)=>Number(selected.has(b[0]))-Number(selected.has(a[0])));
+      for(const [id,label] of labels){
         const item=this.state.equipment.find(e=>e.id===id);
         if(label.hidden||item?.backdrop||(item?.floorId&&this.state.scopeFloorId!==item.floorId)||(!this.showLabels&&!item?.floorSelector&&!this.state.floors?.some(f=>f.id===id)))continue;
         const r=label.getBoundingClientRect();
@@ -215,7 +273,7 @@
       return null;
     }
     placementPoint(event){
-      if(!this.armed||!this.state)return null;
+      if(this.readOnly||!this.armed||!this.state)return null;
       const point=this.floor(event);
       return point&&Math.abs(point.x)<=this.state.site.width/2&&Math.abs(point.z)<=this.state.site.depth/2?point:null;
     }
@@ -226,7 +284,17 @@
       this.invalidate();
     }
     bind(){const canvas=this.renderer.domElement;
-      const equipmentDrag=e=>this.armed&&Array.from(e.dataTransfer?.types||[]).includes('application/x-fems-equipment');
+      // Foreground cards intercept covered portal links and share the canvas controls.
+      const onSurface=(type,handler,options)=>{
+        canvas.addEventListener(type,handler,options);
+        this.labelHost?.addEventListener?.(type,e=>{
+          if(this.readOnly&&e.target.closest?.('.object-label.selected:not(.external-label)')){
+            if(type==='pointerdown')e.preventDefault();
+            handler(e);
+          }
+        },options);
+      };
+      const equipmentDrag=e=>!this.readOnly&&this.armed&&Array.from(e.dataTransfer?.types||[]).includes('application/x-fems-equipment');
       canvas.addEventListener('dragover',e=>{
         if(!equipmentDrag(e))return;
         e.preventDefault();const point=this.placementPoint(e);e.dataTransfer.dropEffect=point?'copy':'none';this.previewPlacement(point);
@@ -238,9 +306,10 @@
         this.previewPlacement(null);
         if(type===this.armed&&point)this.handlers.place(type,Math.round(point.x*2)/2,Math.round(point.z*2)/2);
       });
-      canvas.addEventListener('contextmenu',e=>e.preventDefault());
-      canvas.addEventListener('wheel',e=>{e.preventDefault();if(!this.drag?.axis&&!this.drag?.connection)this.zoom(Math.exp(Math.sign(e.deltaY)*.09));},{passive:false});
-      canvas.addEventListener('pointerdown',e=>{if(this.drag||(e.button!==0&&e.button!==2)||(this.mode==='plan'&&e.button===2))return;
+      onSurface('contextmenu',e=>e.preventDefault());
+      onSurface('wheel',e=>{e.preventDefault();if(!this.drag?.axis&&!this.drag?.connection)this.zoom(Math.exp(Math.sign(e.deltaY)*.09));},{passive:false});
+      onSurface('pointerdown',e=>{if(this.drag||(e.button!==0&&e.button!==2)||(this.mode==='plan'&&e.button===2))return;
+        this.cancelFocus();
         const additive=!this.armed&&(e.ctrlKey||e.metaKey);
         const label=additive?this.pickLabel(e):null;
         const target=e.button===0?(additive?{id:label||this.pick(e),label:!!label}:this.pickTarget(e)):{id:this.armed?null:this.pick(e)};
@@ -267,9 +336,9 @@
           canvas.setPointerCapture(e.pointerId);this.host.style.cursor='default';return;
         }
         const point=this.floor(e);this.drag={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,button:e.button,pointerId:e.pointerId,id,label:target.label,moved:false};
-        if(id&&this.move&&!additive&&e.button===0&&point){this.handlers.select(id);const item=this.state.equipment.find(v=>v.id===id);this.drag.item=M.clone(item);this.drag.offset={x:item.x-point.x,z:item.z-point.z};}
+        if(!this.readOnly&&id&&this.move&&!additive&&e.button===0&&point){this.handlers.select(id);const item=this.state.equipment.find(v=>v.id===id);this.drag.item=M.clone(item);this.drag.offset={x:item.x-point.x,z:item.z-point.z};}
         this.updateCursor();canvas.setPointerCapture(e.pointerId);});
-      canvas.addEventListener('pointermove',e=>{
+      onSurface('pointermove',e=>{
         this.lastPointer={clientX:e.clientX,clientY:e.clientY,altKey:e.altKey};
         if(this.drag?.connection){
           const d=this.drag;if(e.pointerId!==d.pointerId)return;
@@ -299,12 +368,12 @@
         if(d.item&&point){const pos=M.clampPosition(d.item,Math.round((point.x+d.offset.x)*2)/2,Math.round((point.z+d.offset.z)*2)/2,this.state.site);d.position=pos;this.models.get(d.id).position.set(pos.x,0,pos.z);this.footprints.get(d.id).position.set(pos.x,.01,pos.z);this.connections?.setState({...this.state,equipment:this.state.equipment.map(item=>item.id===d.id?{...item,...pos}:item)});this.updateSelection();this.invalidate();}
         else if(d.button===2||!this.armed){if(d.button===0){this.pan(dx,dy);}else if(this.mode==='3d'){this.yaw-=dx*.006;this.pitch=Math.max(.15,Math.min(1.5,this.pitch+dy*.005));}this.updateCamera();}
       });
-      canvas.addEventListener('pointerup',e=>{const d=this.drag;if(!d||e.button!==d.button)return;this.drag=null;this.setHover();if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+      onSurface('pointerup',e=>{const d=this.drag;if(!d||e.button!==d.button)return;this.drag=null;this.setHover();if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
         if(d.axis){this.handlers.gizmoEnd(true);this.invalidate();return;}
         if(d.connection){this.handlers.connectionEnd(true);this.invalidate();return;}
         if(d.item&&d.position)this.handlers.move(d.id,d.position);
         else if(!d.moved&&e.button===0){if(this.armed){const point=this.floor(e);if(point&&Math.abs(point.x)<=this.state.site.width/2&&Math.abs(point.z)<=this.state.site.depth/2)this.handlers.place(this.armed,Math.round(point.x*2)/2,Math.round(point.z*2)/2);}else if(d.label&&this.handlers.selectLabel)this.handlers.selectLabel(d.id,e);else this.handlers.select(d.id||null,e);}});
-      canvas.addEventListener('pointercancel',()=>this.cancelDrag());
+      onSurface('pointercancel',()=>this.cancelDrag());
       canvas.addEventListener('lostpointercapture',()=>{if(this.drag)this.cancelDrag();});
       root.addEventListener?.('blur',()=>{if(this.drag)this.cancelDrag();this.lastPointer=null;this.setHover();});
       canvas.addEventListener('pointerleave',()=>{this.lastPointer=null;this.setHover();this.ghost.visible=false;});
@@ -316,7 +385,36 @@
       canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();this.handlers.error('3D 그래픽 연결이 중단되었습니다. 도면을 저장한 뒤 브라우저를 새로고침하세요. 설비 목록에서 편집·저장할 수 있습니다.');});
       canvas.addEventListener('webglcontextrestored',()=>this.handlers.error('그래픽 연결이 복구되었습니다. 저장 후 새로고침하여 화면을 다시 열어 주세요.'));
     }
-    invalidate(){if(this.pending)return;this.pending=true;requestAnimationFrame(()=>{this.pending=false;if(!this.host.clientHeight||!this.host.clientWidth||root.document?.hidden)return;this.updateGizmo();this.updateHoverVisual();this.connections?.update(this.camera,this.height,this.mode,this.armed,this.connectionSelection,this.drag?null:this.hoverLink,{guides:this.connectionGuides,corner:this.cornerMode,site:this.state?.site});this.floorShadows.update(this.mode);this.renderer.render(this.scene,this.camera);this.updateLabels();this.gizmo?.updateLabels(this.camera,this.width,this.height);this.connectionGizmo?.updateLabels(this.camera,this.width,this.height);if(this.connections?.active)this.invalidate();});}
+    invalidate(){if(this.pending)return;this.pending=true;requestAnimationFrame(time=>{this.pending=false;if(!this.host.clientHeight||!this.host.clientWidth||root.document?.hidden){this.cancelFocus();return;}this.updateFocusAnimation(time);this.updateGizmo();this.updateHoverVisual();this.connections?.update(this.camera,this.height,this.mode,this.armed,this.connectionSelection,this.drag?null:this.hoverLink,{guides:this.connectionGuides,corner:this.cornerMode,site:this.state?.site});this.floorShadows.update(this.mode);this.renderer.render(this.scene,this.camera);this.updateLabels();this.gizmo?.updateLabels(this.camera,this.width,this.height);this.connectionGizmo?.updateLabels(this.camera,this.width,this.height);if(this.connections?.active)this.invalidate();});}
+    updateLabelContent(label,item){
+      const equipment=!!this.readOnly&&!item.buildingShell&&!item.floorSelector&&!item.preview&&!item.backdrop&&item.type!=='space-floor'&&!this.state.buildings?.some(b=>b.id===item.id)&&!this.state.floors?.some(f=>f.id===item.id);
+      const expanded=equipment&&(this.selected===item.id||(!this.drag&&this.hovered===item.id));
+      label.classList?.toggle('equipment-info-open',expanded);
+      if(!equipment){if(label.equipmentInfo||label.textContent!==item.name)label.textContent=item.name;label.equipmentInfo=null;return false;}
+      if(!label.equipmentInfo||label.equipmentInfo.type!==item.type){
+        const title=document.createElement('span'),name=document.createElement('span'),status=document.createElement('span'),values=document.createElement('dl');
+        title.className='equipment-info-name';values.className='equipment-info-values';
+        status.setAttribute('role','img');title.append(status,name);
+        // No measurement source is connected yet. Never present demo numbers as live values.
+        const type=['solar-2x2','solar-3x3'].includes(item.type)?'solar':item.type;
+        for(const caption of billboardMetrics[type]||['전압(V)','전류(A)','유효전력(kW)','역률(pF)']){
+          const term=document.createElement('dt'),value=document.createElement('dd');
+          term.setAttribute('data-i18n-ui','');term.textContent=caption;value.textContent='—';values.append(term,value);
+        }
+        label.equipmentInfo={title,name,status,values,type:item.type};
+      }
+      const info=label.equipmentInfo;
+      if(info.name.textContent!==item.name)info.name.textContent=item.name;
+      // Optional live-data adapter; an absent or unknown status must never imply a healthy connection.
+      const reported=this.handlers.communicationStatus?.(item.id),status=reported==='normal'||reported==='error'?reported:'disconnected';
+      if(info.communicationStatus!==status){
+        info.communicationStatus=status;info.status.className='communication-status communication-status-'+status;
+        const caption={normal:'통신 정상',error:'통신 에러',disconnected:'통신 연결 끊김'}[status];
+        info.status.setAttribute('aria-label',caption);info.status.setAttribute('title',caption);
+      }
+      if(info.expanded!==expanded){label.replaceChildren(...(expanded?[info.title,info.values]:[info.title]));info.expanded=expanded;}
+      return expanded;
+    }
     updateLabels(){
       if(!this.state)return;
       const v=new T.Vector3(),corner=new T.Vector3(),floorLabels=[];
@@ -339,11 +437,16 @@
           }
           v.x=Math.max(-.92,left-.04);
         }
-        const label=this.labels.get(item.id),text=item.name;
-        if(label.textContent!==text)label.textContent=text;
+        const label=this.labels.get(item.id),expanded=this.updateLabelContent(label,item);
         label.hidden=!!item.backdrop||!!(item.floorId&&this.state.scopeFloorId!==item.floorId)||(!this.showLabels&&!item.floorSelector&&!this.state.floors?.some(f=>f.id===item.id))||v.z>1||v.z< -1||Math.abs(v.x)>1.1||Math.abs(v.y)>1.1;
         label.style.left=((v.x+1)/2*this.width)+'px';
         label.style.top=((-v.y+1)/2*this.height-(this.mode==='plan'?4:0))+'px';
+        if(expanded&&!label.hidden){
+          // Keep the expanded card readable at viewport edges without moving the equipment.
+          const half=label.offsetWidth/2,height=label.offsetHeight;
+          label.style.left=Math.max(half+4,Math.min(this.width-half-4,parseFloat(label.style.left)))+'px';
+          label.style.top=Math.max(height+4,Math.min(this.height-4,parseFloat(label.style.top)))+'px';
+        }
         if(item.floorSelector&&!label.hidden)floorLabels.push({label,y:parseFloat(label.style.top),elevation:item.y||0});
       }
       // Stacked floors share the same plan footprint. Keep their navigation labels individually clickable.

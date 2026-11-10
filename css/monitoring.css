@@ -1,0 +1,101 @@
+/* All rules are opt-in: the editor's layout and controls keep their own styles. */
+#monitor-dashboard,#monitor-details{display:none}
+body[data-workspace-mode=monitoring] .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden;min-height:400px}
+/* Only the middle row shares its width with details; toolbar and dashboard span both columns. */
+body[data-workspace-mode=monitoring] .editor{grid-column:1;grid-row:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) 0px;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;transition:grid-template-columns .22s ease}
+body[data-workspace-mode=monitoring].monitor-details-open .editor{grid-template-columns:minmax(0,1fr) min(var(--right-width,var(--right-default)),40vw)}
+body[data-workspace-mode=monitoring] .editor-toolbar{grid-column:1 / -1;grid-row:1}
+body[data-workspace-mode=monitoring] .viewport{grid-column:1;grid-row:2;min-width:0}
+body[data-workspace-mode=monitoring] :is(.catalog-panel,.inspector,.panel-resizer,.equipment-dock,.statusbar,.alignment-tools,#undo,#redo,.history-tools .divider,#empty-state,#catalog-tooltip),
+body[data-workspace-mode=monitoring] .file-actions > button:not(#settings-open){display:none!important}
+body[data-workspace-mode=monitoring] #monitor-dashboard{display:flex;flex-direction:column;gap:8px;grid-column:1 / -1;grid-row:3;height:280px;min-width:0;padding:9px 14px 8px;background:#f5f8f7;border-top:1px solid var(--line)}
+.monitor-dashboard-header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;min-height:25px}
+.monitor-dashboard-tabs{display:flex;flex-wrap:wrap;gap:0;flex-shrink:0}
+.monitor-dashboard-tabs button{font-size:10px;padding:4px 8px;background:transparent;border-color:transparent}
+.monitor-dashboard-tabs button[aria-selected=true]{color:#227b69;background:#e8f2ed}
+#monitor-dashboard-content{flex:1;min-height:0;min-width:0}
+#monitor-dashboard-tools{display:flex;align-items:center;gap:5px;flex-shrink:0}
+#monitor-dashboard-tools button{width:26px;height:25px;padding:0;font-size:20px;line-height:1;color:#46645d;border-color:#dce6e1;background:#fff}
+.dashboard-demo{color:#798e87;font-size:10px;letter-spacing:.02em;margin-right:7px}
+.dashboard-strip{height:100%;display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;padding:1px 1px 8px;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#a7beb4 #eaf0ed;outline-offset:-2px}
+.dashboard-strip:focus-visible{outline:2px solid #268c78}
+.dashboard-strip::-webkit-scrollbar{height:7px}
+.dashboard-strip::-webkit-scrollbar-thumb{background:#a7beb4;border-radius:8px}
+.dashboard-strip::-webkit-scrollbar-track{background:#eaf0ed}
+.dashboard-card{flex:0 0 240px;min-width:0;height:100%;border:1px solid #dce7e2;border-radius:9px;background:#fff;padding:13px 15px;display:flex;flex-direction:column;color:#24463f;font-variant-numeric:tabular-nums;overflow-y:auto}
+.dashboard-card h3{font-size:12px;font-weight:650;line-height:18px;letter-spacing:-.15px;margin:0;color:#46655c}
+.dashboard-card header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dashboard-unit{font-size:12px;font-weight:450;color:#81958d;margin-left:4px}
+.dashboard-gauge{position:relative;flex:1;min-height:100px;display:grid;place-items:center}
+.dashboard-gauge svg,.peak-gauge{width:100%;height:121px;max-height:100%;flex:1;min-height:95px}
+.gauge-track,.gauge-fill{fill:none;stroke-width:18}
+.gauge-track{stroke:#eaf1ed}.gauge-fill{stroke:#299c87}
+.gauge-value{position:absolute;bottom:12px;left:0;right:0;text-align:center;line-height:1}
+.gauge-value strong{font-size:34px;font-weight:650;letter-spacing:-1px}
+.dashboard-card-footer{display:flex;justify-content:space-between;align-items:baseline;padding-top:7px;color:#7c9188;font-size:11px}
+.dashboard-card-footer b{color:#2d5549;font-size:23px;font-weight:600}
+.dashboard-card-footer .peak-time{font-size:15px}
+.dashboard-peak{white-space:nowrap}.dashboard-peak strong{font-size:23px;font-weight:650}
+.tick-low{stroke:#3eac8c}.tick-mid{stroke:#d6b85b}.tick-high{stroke:#dc8382}.gauge-needle{fill:#6c8780}
+.hourly-card{flex-basis:420px}
+.hourly-card header{align-items:flex-start}
+.dashboard-chip{font-size:9px;background:#eff5f1;border-radius:4px;padding:4px 6px;color:#7a8f85;white-space:nowrap}
+.dashboard-chip b{font-size:12px;color:#345e4e;margin:0 3px}
+.hourly-chart{width:100%;flex:1;min-height:120px}
+.chart-grid line{stroke:#e7eeea;stroke-dasharray:3 3}.chart-grid text,.chart-labels text{font-size:9px;fill:#899b93}
+.chart-today{fill:#43a89a}.chart-yesterday{fill:none;stroke:#a6bb64;stroke-width:2}
+.dashboard-legend{display:flex;align-items:center;justify-content:center;gap:17px;font-size:9px;color:#83968e;white-space:nowrap}
+.dashboard-legend span{display:flex;align-items:center;gap:5px}.dashboard-legend i{display:inline-block;width:8px;height:8px;border-radius:1px}.legend-today{background:#43a89a}.legend-yesterday{background:#a6bb64}
+.comparison-card{flex-basis:320px}
+.dashboard-total{display:flex;justify-content:center;align-items:baseline;gap:2px;padding:6px 0 8px}
+.dashboard-total strong{font-size:28px;line-height:32px;letter-spacing:-.8px;font-weight:650}
+.dashboard-comparisons{display:grid;gap:6px;font-size:10px;color:#89988f;white-space:nowrap}
+.dashboard-comparisons>div{display:flex;justify-content:space-between;gap:10px}
+.dashboard-comparisons b{font-size:11px;font-weight:600;color:#299477}.dashboard-comparisons small{font-size:9px;font-weight:450}.dashboard-comparisons em{font-style:normal;margin-left:9px}
+.dashboard-bars{display:grid;gap:8px;margin-top:auto;padding-top:12px}
+.dashboard-bar-row{display:flex;align-items:center;gap:8px;font-size:9px;color:#8b9b93;height:13px}
+.dashboard-bar-row>span{width:22px;flex-shrink:0}.dashboard-bar-row>b{font-size:9px;font-weight:450;width:40px;text-align:right}
+.dashboard-bar-track{flex:1;height:10px;background:#f3f6f4;border-radius:2px;overflow:hidden}.dashboard-bar-track i{display:block;height:100%;border-radius:2px}.bar-0{background:#3ba78b}.bar-1{background:#dfb766}.bar-2{background:#d8898c}
+.emissions-card{flex-basis:310px}.emissions-card dl{margin:5px 0 0;display:flex;flex-direction:column;flex:1}.emissions-card dl>div{display:flex;justify-content:space-between;align-items:center;gap:16px;flex:1;border-bottom:1px solid #edf1ee}.emissions-card dl>div:last-child{border-bottom:0}.emissions-card dt{font-size:11px;color:#7d9387;white-space:nowrap}.emissions-card dt span{font-size:10px}.emissions-card dd{margin:0;white-space:nowrap}.emissions-card dd strong{font-size:21px;font-weight:600;letter-spacing:-.4px}.emissions-card .dashboard-unit{font-size:10px}
+body[data-workspace-mode=monitoring] #monitor-details{display:block;grid-column:2;grid-row:2;min-height:0;width:min(var(--right-width,var(--right-default)),40vw);background:#fff;border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .22s ease,visibility .22s;z-index:20}
+body[data-workspace-mode=monitoring].monitor-details-open #monitor-details{transform:translateX(0);visibility:visible}
+body[data-workspace-mode=monitoring] .schematic-edge{pointer-events:none}
+@media(max-width:760px){body[data-workspace-mode=monitoring] .workspace{height:calc(100dvh - 52px);min-height:400px}body[data-workspace-mode=monitoring] #monitor-dashboard{height:280px;padding-inline:8px}.monitor-dashboard-header{flex-wrap:wrap}.dashboard-demo{margin-right:2px}}
+@media(max-height:650px){body[data-workspace-mode=monitoring] #monitor-dashboard{height:240px}.dashboard-card{padding:9px 12px}.dashboard-gauge svg,.peak-gauge{height:100px;min-height:75px}.gauge-value{bottom:8px}.gauge-value strong{font-size:28px}.dashboard-total{padding:2px 0 5px}.dashboard-total strong{font-size:24px;line-height:27px}.dashboard-bars{padding-top:8px;gap:5px}.hourly-chart{min-height:95px}}
+@media(prefers-reduced-motion:reduce){body[data-workspace-mode=monitoring] .editor,body[data-workspace-mode=monitoring] #monitor-details{transition:none}}
+@media(max-height:650px){.dashboard-gauge{min-height:80px}}
+.solar-generation-card{flex-basis:430px}
+.solar-generation-body{display:flex;align-items:center;gap:24px;flex:1;min-height:0;margin-top:8px;padding:8px 14px;background:#f5f9f6;border:1px solid #edf2ee;border-radius:6px}
+.solar-output-gauge{position:relative;flex:0 0 134px;height:134px}
+.solar-output-gauge svg{width:100%;height:100%}
+.solar-ring-track,.solar-ring-value{fill:none;stroke-width:12}.solar-ring-track{stroke:#e3ece6}.solar-ring-value{stroke:#3ba78b}
+.solar-output-value{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.solar-output-value strong{font-size:34px;font-weight:650;line-height:1;letter-spacing:-1px}.solar-output-value .dashboard-unit{margin:0}
+.solar-generation-stats{display:grid;gap:17px;margin:0;flex:1;min-width:0}.solar-generation-stats dt{font-size:11px;color:#7d9387;margin-bottom:4px;white-space:nowrap}.solar-generation-stats dd{margin:0;white-space:nowrap}.solar-generation-stats strong{font-size:27px;line-height:1.1;font-weight:650;letter-spacing:-.6px}.solar-generation-stats time{color:#8b9b93;font-size:10px;margin-left:10px}
+.solar-inverter-card{flex-basis:480px}
+.ess-table{border-collapse:separate;border-spacing:0;border:1px solid #e2ebe6;border-radius:5px;overflow:hidden;width:100%;table-layout:fixed;text-align:center;font-size:12px}
+.ess-table th,.ess-table td{border-right:1px solid #e7eee9;border-bottom:1px solid #e7eee9;padding:5px 4px;white-space:nowrap}.ess-table tr>:last-child{border-right:0}.ess-table tbody tr:last-child>*{border-bottom:0}.ess-table th{background:#f0f5f2;color:#7d9387;font-size:10px;font-weight:500}.ess-table td{font-weight:550}.ess-table .dashboard-unit{font-size:9px;margin-left:2px}
+.ess-energy-card{flex-basis:250px;gap:10px}.ess-energy-card section{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0}.ess-energy-card dl{margin:0;flex:1;display:flex;flex-direction:column}.ess-energy-card dl>div{display:flex;align-items:center;justify-content:space-between;gap:6px;flex:1;padding:3px 7px;background:#f6f9f7;border-radius:4px}.ess-energy-card dt{font-size:10px;color:#81958d}.ess-energy-card dd{margin:0;white-space:nowrap}.ess-energy-card dd strong{font-size:21px;font-weight:600;letter-spacing:-.5px}.ess-energy-card .dashboard-unit{font-size:10px}.ess-energy-card .charging{background:#fbf4e5}.ess-energy-card .discharging{background:#e9f5ee}
+.ess-pcs-card{flex-basis:580px}.ess-pcs-body{display:flex;gap:15px;flex:1;min-height:0;margin-top:9px}.ess-pcs-summary{width:195px;flex-shrink:0;display:flex;flex-direction:column;min-height:0}.ess-pcs-gauge{position:relative;flex:1;min-height:0;display:flex;align-items:center}.ess-pcs-gauge svg{width:100%;height:100%;max-height:130px}.ess-discharge-arc{fill:none;stroke:#d8898c;stroke-width:18}.ess-pcs-gauge>div{position:absolute;bottom:12px;left:0;right:0;text-align:center;white-space:nowrap}.ess-pcs-gauge strong{font-size:26px;font-weight:650;letter-spacing:-.8px}.ess-pcs-status{display:flex;background:#f4f8f5;border:1px solid #e3ece5;border-radius:4px;font-size:11px;min-height:29px}.ess-pcs-status>span{flex:1;text-align:center;align-content:center;border-right:1px solid #e3ece5;white-space:nowrap}.ess-pcs-status>span:last-child{border:0}.ess-pcs-status .dashboard-unit{font-size:9px}.ess-discharging{color:#bd7477;font-weight:600}.ess-grid-table{flex:1}.ess-grid-table th:first-child{width:110px}
+.ess-bms-card{flex-basis:320px}.ess-battery{width:164px;height:31px;margin:10px auto;position:relative;border:3px solid #708c7f;border-radius:6px;padding:3px}.ess-battery:after{content:'';position:absolute;right:-7px;top:7px;height:11px;width:5px;border-radius:0 2px 2px 0;background:#708c7f}.ess-battery>div{height:100%;background:#e3ece6;border-radius:2px;overflow:hidden}.ess-battery i{display:block;height:100%;background:#3ba78b}.ess-bms-table{flex:1}.ess-bms-charge td{color:#2d9477;font-size:15px;font-weight:600}
+.ess-customer-card{flex-basis:390px;gap:7px}.ess-tariff-table th{width:84px}.ess-tariff-table td{font-size:11px}.ess-savings{display:flex;gap:9px;flex:1;min-height:0}.ess-savings-table{flex:1;font-size:11px}.ess-savings-table caption{text-align:left;font-size:10px;color:#537b67;font-weight:600;padding-bottom:4px}.ess-savings-table th{width:38px}.ess-savings-table td{text-align:right;padding-right:7px}.ess-savings-table td b{font-weight:550}.ess-savings-table .dashboard-unit{font-size:8px}
+@media(max-height:650px){.ess-energy-card{gap:5px}.ess-energy-card section{gap:3px}.ess-energy-card dd strong{font-size:19px}.ess-energy-card dl>div{padding-block:1px}.ess-pcs-body{margin-top:5px;gap:12px}.ess-pcs-gauge>div{bottom:8px}.ess-pcs-gauge strong{font-size:24px}.ess-pcs-status{min-height:23px}.ess-table th,.ess-table td{padding:3px}.ess-battery{height:26px;margin:5px auto}.ess-battery:after{top:5px}.ess-bms-charge td{font-size:13px}.ess-customer-card{gap:4px}.ess-savings-table caption{padding-bottom:2px}}
+.ups-dashboard-group{display:flex;flex-direction:column;gap:7px;flex:0 0 auto;min-width:0;height:100%}
+.ups-dashboard-group>h3{margin:0 0 0 2px;color:#6c887b;font-size:12px;font-weight:550;line-height:18px}
+.ups-dashboard-cards{display:flex;gap:10px;flex:1;min-height:0}
+.ups-device-card{flex:0 0 340px;width:340px;padding:10px 12px}
+.ups-device-card h4{margin:0 0 7px;font-size:12px;line-height:17px;font-weight:650;color:#46655c}
+.ups-status-table{width:100%;flex:1;table-layout:fixed;border-collapse:separate;border-spacing:0;border:1px solid #e2ebe6;border-radius:5px;overflow:hidden;text-align:center;font-variant-numeric:tabular-nums}
+.ups-status-table th,.ups-status-table td{padding:4px 2px;border-right:1px solid #e7eee9;border-bottom:1px solid #e7eee9;white-space:nowrap;height:24px}
+.ups-status-table th{font-size:10px;font-weight:500;background:#f0f5f2;color:#7d9387}
+.ups-status-table td{font-size:12px;background:#fff}.ups-status-table b{font-weight:600}.ups-status-table .dashboard-unit{font-size:8px;margin-left:1px;color:#889c91}
+.ups-status-table tr>:last-child{border-right:0}.ups-status-table tbody tr:last-child>*{border-bottom:0}.ups-alarm{font-size:11px;color:#a68949}
+@media(max-height:650px){.ups-dashboard-group{gap:4px}.ups-device-card{padding:6px 10px}.ups-device-card h4{margin-bottom:4px;line-height:15px}.ups-status-table th,.ups-status-table td{padding:2px;height:20px}}
+.solar-inverter-table caption{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.solar-inverter-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;margin-top:12px;flex:1;font-size:12px;text-align:center;border:1px solid #e2ebe6;border-radius:6px;overflow:hidden}
+.solar-inverter-table th,.solar-inverter-table td{padding:8px 6px;border-bottom:1px solid #e7eee9;border-right:1px solid #e7eee9;white-space:nowrap}
+.solar-inverter-table tr>:last-child{border-right:0}.solar-inverter-table tbody tr:last-child>*{border-bottom:0}
+.solar-inverter-table thead th{background:#f0f5f2;color:#7d9387;font-size:11px;font-weight:500}.solar-inverter-table th:first-child{width:76px}.solar-inverter-table tbody th{background:#f5f9f6;color:#537b67;font-weight:550}
+.solar-inverter-table td b{font-size:15px;font-weight:600}.solar-inverter-table .dashboard-unit{font-size:10px}
+.inverter-state{display:inline-flex;align-items:center;gap:5px;font-size:11px}.inverter-state:before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}.inverter-state.running{color:#2d9477}.inverter-state.standby{color:#a68949}.inverter-missing{color:#a3b1a9}
+@media(max-height:650px){.solar-generation-body{padding:4px 12px;gap:20px;margin-top:5px}.solar-output-gauge{flex-basis:108px;height:108px}.solar-output-value strong{font-size:29px}.solar-generation-stats{gap:10px}.solar-generation-stats strong{font-size:24px}.solar-inverter-table{margin-top:6px}.solar-inverter-table th,.solar-inverter-table td{padding:5px 6px}}

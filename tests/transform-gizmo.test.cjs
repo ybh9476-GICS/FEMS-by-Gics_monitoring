@@ -74,6 +74,23 @@ function sceneFixture(plan = false, axis = 'x') {
   scene.bind();return {scene,h,listeners,previews,start:axis==='xz'?gizmo.planeHandle.getWorldPosition(new T.Vector3()):handleAt(axis)};
 }
 
+test('관제 모드는 3D·평면도에서 연결선·기즈모를 건너뛰고 객체 선택과 카메라 드래그만 허용한다',()=>{
+  for(const plan of [false,true]){
+    const {scene,h,listeners,start}=sceneFixture(plan),before=JSON.stringify(h.current),id=scene.selected;
+    let selected=null,pans=0;
+    scene.readOnly=true;scene.move=true;scene.pickLabel=()=>null;scene.pick=()=>id;
+    scene.connections={pick(){throw Error('관제에서 연결선 선택');},pickHandle(){throw Error('관제에서 연결선 핸들 선택');}};
+    scene.handlers.select=value=>selected=value;scene.pan=()=>pans++;scene.updateCamera=()=>{};
+    assert.equal(scene.pickGizmo({}),null);assert.equal(scene.pickTarget({}).id,id);assert.equal(scene.placementPoint({}),null);
+    listeners.pointerdown({button:0,pointerId:1,clientX:100,clientY:100,world:start});
+    assert.equal(scene.drag.item,undefined);assert.equal(scene.drag.axis,undefined);
+    listeners.pointerup({button:0,pointerId:1});assert.equal(selected,id);
+    listeners.pointerdown({button:0,pointerId:1,clientX:100,clientY:100,world:start});
+    listeners.pointermove({pointerId:1,clientX:120,clientY:120,world:start});listeners.pointerup({button:0,pointerId:1});
+    assert.equal(pans,1);assert.equal(JSON.stringify(h.current),before);assert.equal(h.past.length,0);
+  }
+});
+
 test('XZ 평면 핸들은 여러 시점과 확대율에서 두 좌표를 함께 이동하며 시작점이 튀지 않는다',()=>{
   for(const plan of [false,true])for(const yaw of [0,.6,Math.PI/2,-1.2])for(const zoom of [.5,1,3]){
     const {gizmo,camera,item,rayAt}=setup(yaw,.77,plan);camera.zoom=zoom;camera.updateProjectionMatrix();

@@ -38,3 +38,17 @@
 .alignment-tools button{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:6px;background:#ffffffed;border:1px solid var(--line);border-radius:5px}
 .alignment-tools button svg{width:17px;height:17px}
 .alignment-tools button:disabled{opacity:.38;cursor:default}
+
+body[data-workspace-mode=monitoring] .object-label.selected{z-index:1;pointer-events:auto;touch-action:none}
+.object-label.equipment-info-open{width:148px;max-width:calc(100% - 8px);padding:0;overflow:hidden;white-space:normal;background:#f6fffa;box-shadow:0 4px 14px #263e361a}
+.equipment-info-name{display:flex;align-items:center;gap:5px;overflow-wrap:anywhere;font-size:inherit;line-height:1.2}
+.equipment-info-name>span:last-child{min-width:0}
+.equipment-info-open .equipment-info-name{padding:5px 8px;font-size:10px}
+.communication-status{display:inline-block;flex:0 0 .5em;width:.5em;height:1em;border-radius:1px}
+.communication-status-normal{background:#2e9b54}
+.communication-status-error{background:#d54b48}
+.communication-status-disconnected{background:#929b99}
+.equipment-info-values{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;margin:0;padding:5px 8px;background:#e7efeb;border-top:1px solid #d5e1da;font-size:10px;line-height:1.2;font-weight:400}
+.equipment-info-values dt,.equipment-info-values dd{margin:0}
+.equipment-info-values dt{color:#617478}
+.equipment-info-values dd{font-variant-numeric:tabular-nums;font-weight:600}
