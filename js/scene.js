@@ -1,17 +1,11 @@
 (function (root) {
   'use strict';
   const T=root.THREE, M=root.FEMSModel;
-  const billboardMetrics={
-    tower:['계약 전력','유효 전력','부하율'],
-    solar:['일간 발전량','일간 발전 시간','입력 전력','출력 전력'],
-    ess:['일간 충전량','일간 방전량','일간 효율'],
-    ups:['입력','출력','배터리','유효전력']
-  };
   class Scene {
     constructor(host, labels, handlers, rotateButton = null) {
       this.host=host;this.labelHost=labels;this.handlers=handlers;this.models=new Map();this.labels=new Map();this.footprints=new Map();
       this.selected=null;this.mode='3d';this.armed=null;this.move=false;this.showLabels=true;this.radius=48;this.yaw=.6;this.planYaw=0;this.pitch=.77;this.target=new T.Vector3(0,0,0);
-      this.renderer=new T.WebGLRenderer({antialias:true,alpha:false,stencil:true});this.renderer.setPixelRatio(Math.min(root.devicePixelRatio||1,2));this.renderer.setClearColor('#eef2f3');
+      this.renderer=new T.WebGLRenderer({antialias:true,alpha:false,stencil:true});this.renderer.setPixelRatio(Math.min(root.devicePixelRatio||1,2));
       this.renderer.shadowMap.enabled=true;this.renderer.shadowMap.type=T.PCFShadowMap;this.renderer.outputColorSpace=T.SRGBColorSpace;host.appendChild(this.renderer.domElement);
       this.scene=new T.Scene();this.scene.add(new T.HemisphereLight('#faffff','#839d96',2.7));
       const sun=new T.DirectionalLight('#fff6e7',3);sun.position.set(-20,35,20);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-38;sun.shadow.camera.right=38;sun.shadow.camera.top=32;sun.shadow.camera.bottom=-32;sun.shadow.normalBias=.06;this.scene.add(sun);
@@ -25,9 +19,15 @@
       this.connectionGizmo=new root.FEMSTransformGizmo(this.scene,this.labelHost,null,{vertical:true});
       this.connectionSelection=null;
       root.document?.addEventListener('visibilitychange',()=>this.invalidate());
+      root.addEventListener?.('fems-theme-change',()=>this.updateBackground());
       const ghostGeometry=new T.PlaneGeometry(1,1);this.ghost=new T.Mesh(ghostGeometry,new T.MeshBasicMaterial({color:'#4caa86',opacity:.25,transparent:true,side:T.DoubleSide,depthWrite:false}));this.ghost.rotation.x=-Math.PI/2;this.ghost.visible=false;this.scene.add(this.ghost);
       this.observer=new ResizeObserver(()=>this.resize());this.observer.observe(host);
-      this.bind();this.resize();
+      this.bind();this.updateBackground();this.resize();
+    }
+    updateBackground(){
+      // Only the empty canvas background follows the UI theme; ground, materials and lighting stay intact.
+      this.renderer.setClearColor(root.FEMSTheme?.mode==='dark'?'#111b22':'#eef2f3');
+      this.invalidate();
     }
     styleSpatial(model,item){
       // GLB instances share cached materials: clone only the display overrides, never mutate the asset.
@@ -396,8 +396,7 @@
         title.className='equipment-info-name';values.className='equipment-info-values';
         status.setAttribute('role','img');title.append(status,name);
         // No measurement source is connected yet. Never present demo numbers as live values.
-        const type=['solar-2x2','solar-3x3'].includes(item.type)?'solar':item.type;
-        for(const caption of billboardMetrics[type]||['전압(V)','전류(A)','유효전력(kW)','역률(pF)']){
+        for(const caption of root.FEMSCatalog.billboardMetrics(item.type)){
           const term=document.createElement('dt'),value=document.createElement('dd');
           term.setAttribute('data-i18n-ui','');term.textContent=caption;value.textContent='—';values.append(term,value);
         }

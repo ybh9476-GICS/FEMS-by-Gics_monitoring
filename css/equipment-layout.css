@@ -15,7 +15,7 @@
 #equipment-tree > .tree-document > ul { margin-left: 7px; padding-left: 2px; }
 .catalog-panel .panel-heading, .inspector .panel-heading { padding-block: 12px 10px; }
 .catalog-panel .search-box { gap: 4px; padding-inline: 5px; }
-.catalog-panel .search-box input { margin-top: 0; padding-block: 5px; }
+.catalog-panel .search-box input { margin-top: 0; padding: 5px 10px; }
 @media(min-width:1600px) { .catalog-panel .panel-heading, .inspector .panel-heading { padding-top: 14px; } }
 @media(max-width:1150px) { .catalog-panel .panel-heading, .inspector .panel-heading { padding-block: 10px; } }
 @media(max-width:760px) { .catalog-panel .panel-heading, .inspector .panel-heading { padding-block: 9px; } }

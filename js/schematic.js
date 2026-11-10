@@ -47,10 +47,10 @@
     createCard(n){
       const systemSite=this.state.site.name===undefined&&!this.state.floors?.find(f=>f.id===this.state.equipment.find(e=>e.id===n.id)?.floorId)?.buildingId;
       const g=svg('g',{transform:`translate(${n.x} ${n.y})`,'data-node':n.id,'data-stage':n.rank+1,'data-tone':n.rank%8,class:'schematic-node',...(!this.readOnly&&systemSite?{'data-i18n-site-suffix':n.space}:{}),tabindex:0,role:'button','aria-label':this.readOnly?n.name:n.name+' · '+n.space});
-      g.append(this.readOnly?svg('title',{'data-i18n-skip':''},n.name):nodeTitle(n,systemSite),svg('rect',{class:'schematic-card',width:n.width,height:n.height,rx:10}),svg('rect',{class:'schematic-card-accent',x:6,y:10,width:4,height:n.height-20,rx:2,'aria-hidden':true}),svg('text',{x:18,y:this.readOnly?22:25,class:'schematic-node-name'},this.shorten(n.name,22)));
+      g.append(this.readOnly?svg('title',{'data-i18n-skip':''},n.name):nodeTitle(n,systemSite),svg('rect',{class:'schematic-card',width:n.width,height:n.height,rx:10}),svg('rect',{class:'schematic-card-accent',x:this.readOnly?8:6,y:this.readOnly?12:10,width:4,height:this.readOnly?10:n.height-20,rx:this.readOnly?1:2,'aria-hidden':true}),svg('text',{x:18,y:this.readOnly?22:25,class:'schematic-node-name'},this.shorten(n.name,22)));
       if(this.readOnly){
         // Match the billboard until live measurements are connected.
-        ['전압(V)','전류(A)','유효전력(kW)','역률(pF)'].forEach((caption,index)=>{
+        root.FEMSCatalog.billboardMetrics(n.type).forEach((caption,index)=>{
           const y=42+index*12;
           g.append(svg('text',{x:18,y:y-3,class:'schematic-node-metric','data-i18n-ui':''},caption),svg('text',{x:n.width-16,y,class:'schematic-node-metric','text-anchor':'end'},'—'));
         });

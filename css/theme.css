@@ -1,14 +1,21 @@
-/* UI-only theme. No canvas filters, scene materials, lighting or camera changes. */
+/* No canvas filters, scene material, lighting or camera changes. */
 :root[data-theme=dark]{
   color:#dfebe8;background:#111b22;color-scheme:dark;
   --ui-bg:#111b22;--ui-panel:#19272e;--ui-raised:#22343b;--ui-input:#132128;
   --ui-text:#dfebe8;--ui-muted:#a2b6b4;--ui-accent:#75d4b5;--ui-selected:#28483f;
   --green:#227b69;--line:#35494e;--muted:#a2b6b4;
 }
-/* Keep the rendered scene and its overlays in their existing light palette. */
-:root[data-theme=dark] .viewport{color:#283c43;--line:#e2e8e8;color-scheme:light}
+/* The empty workspace follows the theme; ground, equipment and overlays keep their palette. */
+:root[data-theme=dark] .viewport{background:#111b22;color:#283c43;--line:#e2e8e8;color-scheme:light}
+:root[data-theme=dark] .scene-controls>div{border-color:#526168;box-shadow:0 3px 8px #0002}
+:root[data-theme=dark] .scene-controls button{background:#526168;color:#edf3f1;border-color:#65757c}
+:root[data-theme=dark] .scene-controls button:hover{background:#617279}
+:root[data-theme=dark] .scene-controls button:focus-visible{outline:2px solid var(--ui-accent);outline-offset:-3px}
 :root[data-theme=dark] :is(.floor-dialog-preview,#asset-preview){color:#283c43;color-scheme:light}
 :root[data-theme=dark] :is(.topbar,.catalog-panel,.inspector,.equipment-dock){background:var(--ui-panel);color:var(--ui-text)}
+:root[data-theme=dark] .equipment-dock{border-top-color:var(--line)}
+:root[data-theme=dark] #asset-open{border-color:var(--line)}
+:root[data-theme=dark] #asset-open:hover{border-color:#638b80}
 :root[data-theme=dark] :is(.editor-toolbar,.statusbar){background:var(--ui-bg);color:var(--ui-muted)}
 :root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,.statusbar,dialog,#monitor-dashboard,#monitor-details,#schematic) :is(button,input,select,textarea){color:var(--ui-text);background-color:var(--ui-input);border-color:var(--line)}
 :root[data-theme=dark] :where(.topbar,.catalog-panel,.inspector,.editor-toolbar,.equipment-dock,dialog,#monitor-dashboard,#monitor-details,#schematic) button:hover{background-color:var(--ui-raised);border-color:#638b80}
@@ -37,6 +44,9 @@
 :root[data-theme=dark] .divider{background:var(--line)}
 :root[data-theme=dark] :is(.equipment-card,.catalog-item){background:var(--ui-panel);border-color:var(--line);color:var(--ui-text)}
 :root[data-theme=dark] .catalog-item[aria-pressed=true]{background:var(--ui-selected);border-color:#71b79c}
+:root[data-theme=dark] .equipment-thumbnail{background:var(--ui-input);border-color:var(--line)}
+:root[data-theme=dark] .equipment-thumbnail:hover{background:var(--ui-raised);border-color:#638b80}
+:root[data-theme=dark] .equipment-thumbnail[aria-pressed=true]{background:var(--ui-selected);border-color:#71b79c}
 :root[data-theme=dark] .number-scrub{background:var(--ui-raised);color:var(--ui-muted);border-color:var(--line)}
 :root[data-theme=dark] :is(.error-message,button.danger){color:#f5a59a}
 :root[data-theme=dark] #connection-selection{color:var(--ui-accent)}
@@ -70,8 +80,8 @@
 :root[data-theme=dark] .monitor-dashboard-tabs button[aria-selected=true]{background:var(--ui-selected);color:var(--ui-accent)}
 :root[data-theme=dark] #monitor-dashboard-tools button{background:var(--ui-panel);color:var(--ui-text);border-color:var(--line)}
 :root[data-theme=dark] .dashboard-card{background:var(--ui-panel);color:var(--ui-text);border-color:var(--line)}
-:root[data-theme=dark] :is(.dashboard-card h3,.ups-device-card h4,.ups-dashboard-group>h3){color:#c6dcd5}
-:root[data-theme=dark] :is(.dashboard-unit,.dashboard-demo,.dashboard-card-footer,.dashboard-legend,.dashboard-comparisons,.dashboard-bar-row,.emissions-card dt,.solar-generation-stats dt,.solar-generation-stats time,.ess-energy-card dt,.ups-status-table .dashboard-unit){color:var(--ui-muted)}
+:root[data-theme=dark] .dashboard-card h3{color:#c6dcd5}
+:root[data-theme=dark] :is(.dashboard-unit,.dashboard-card-footer,.dashboard-legend,.dashboard-comparisons,.dashboard-bar-row,.emissions-card dt,.solar-generation-stats dt,.solar-generation-stats time,.ess-energy-card dt,.ups-status-table .dashboard-unit){color:var(--ui-muted)}
 :root[data-theme=dark] :is(.dashboard-card-footer b,.dashboard-chip b){color:var(--ui-text)}
 :root[data-theme=dark] :is(.dashboard-chip,.solar-generation-body,.ess-pcs-status,.ess-energy-card dl>div){background:var(--ui-input);border-color:var(--line);color:var(--ui-text)}
 :root[data-theme=dark] .dashboard-chip{color:var(--ui-muted)}
@@ -79,9 +89,10 @@
 :root[data-theme=dark] :is(.dashboard-bar-track,.ess-battery>div){background:#30474c}
 :root[data-theme=dark] .chart-grid line{stroke:#35494e}
 :root[data-theme=dark] :is(.chart-grid text,.chart-labels text){fill:var(--ui-muted)}
-:root[data-theme=dark] :is(.dashboard-comparisons b,.inverter-state.running,.ess-bms-charge td){color:#75d4b5}
+:root[data-theme=dark] :is(.dashboard-comparisons b,.inverter-state.running){color:#75d4b5}
 :root[data-theme=dark] :is(.ups-alarm,.inverter-state.standby){color:#e8c37b}
 :root[data-theme=dark] .inverter-missing{color:var(--ui-muted)}
+:root[data-theme=dark] .ess-bms-charge td{color:var(--ui-text)}
 :root[data-theme=dark] .ess-discharging{color:#f1a0a5}
 :root[data-theme=dark] :is(.emissions-card dl>div,.ess-pcs-status>span){border-color:var(--line)}
 :root[data-theme=dark] .ess-energy-card .charging{background:#403827}

@@ -251,9 +251,9 @@ for(const mode of ['3d','plan'])test(`${mode}: 관제 빌보드는 기본·호�
     scene.state.floors=[];scene.updateLabels();assert.ok(label.classes.has('equipment-info-open'));
     item.name='변경된 이름';scene.updateLabels();assert.equal(label.children[0].textContent,item.name);
     // Reusing the label after an equipment type change must not retain old rows.
-    const expected={tower:['계약 전력','유효 전력','부하율'],solar:['일간 발전량','일간 발전 시간','입력 전력','출력 전력'],ess:['일간 충전량','일간 방전량','일간 효율'],ups:['입력','출력','배터리','유효전력'],panel:['전압(V)','전류(A)','유효전력(kW)','역률(pF)']};
-    for(const type of ['tower','solar','solar-2x2','solar-3x3','ess','ups','panel']){
-      item.type=type;const snapshot=JSON.stringify(scene.state),captions=expected[type]||expected.solar;
+    const expected={tower:['계약 전력(kW)','유효 전력(kW)','부하율(%)'],solar:['일간 발전량(kWh)','일간 발전 시간(h)','입력 전력(kW)','출력 전력(kW)'],ess:['일간 충전량(kWh)','일간 방전량(kWh)','일간 효율(%)'],ups:['입력 전압(Vac)','출력 전압(Vac)','배터리(%)','유효전력(kW)'],panel:['전압(V)','전류(A)','유효전력(kW)','역률(pF)']};
+    for(const type of [...context.FEMSCatalog.builtin.map(def=>def.type),'asset-custom','unknown']){
+      item.type=type;const snapshot=JSON.stringify(scene.state),captions=expected[type]||(['solar-2x2','solar-3x3'].includes(type)?expected.solar:expected.panel);
       scene.selected=null;scene.hovered=null;scene.updateLabels();assert.equal(label.textContent,item.name);
       scene.hovered=item.id;scene.updateLabels();
       assert.deepEqual(label.equipmentInfo.values.children.map(c=>c.textContent),captions.flatMap(c=>[c,'—']));

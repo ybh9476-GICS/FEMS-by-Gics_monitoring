@@ -13,10 +13,19 @@
     { type: 'solar-3x3', name: '태양광 패널 3×3', en: 'Solar panel array 3×3', code: 'PV', group: '발전·저장', color: '#387fa9', width: 15, depth: 9, height: 1.8, description: '기존 태양광 패널 9개를 가로 3개·세로 3개로 붙인 배열입니다. 하나의 설비로 배치·이동·크기 조절합니다.' },
     { type: 'ess', name: 'ESS', en: 'Energy storage system', code: 'ESS', group: '발전·저장', color: '#39957e', width: 4, depth: 2, height: 2.6, description: '에너지 저장장치로, 전력을 저장하고 필요할 때 공급합니다.' }
   ].map(Object.freeze);
+  // Shared monitoring captions for 3D, plan and schematic billboards.
+  const billboardMetrics=Object.freeze(Object.fromEntries(Object.entries({
+    tower:['계약 전력(kW)','유효 전력(kW)','부하율(%)'],
+    solar:['일간 발전량(kWh)','일간 발전 시간(h)','입력 전력(kW)','출력 전력(kW)'],
+    ess:['일간 충전량(kWh)','일간 방전량(kWh)','일간 효율(%)'],
+    ups:['입력 전압(Vac)','출력 전압(Vac)','배터리(%)','유효전력(kW)']
+  }).map(([type,captions])=>[type,Object.freeze(captions)])));
+  const defaultBillboardMetrics=Object.freeze(['전압(V)','전류(A)','유효전력(kW)','역률(pF)']);
   const F=typeof module!=='undefined'&&module.exports?require('./asset-format.js'):root.FEMSAssetFormat;
   const custom=new Map();
   const api = Object.freeze({
     builtin:Object.freeze(catalog),
+    billboardMetrics:type=>billboardMetrics[['solar-2x2','solar-3x3'].includes(type)?'solar':type]||defaultBillboardMetrics,
     get catalog(){return [...catalog,...custom.values()];},
     register(entries){const valid=entries.map(F.metadata);for(const def of valid)custom.set(def.type,Object.freeze(def));},
     replace(entries){const valid=entries.map(F.metadata);custom.clear();for(const def of valid)custom.set(def.type,Object.freeze(def));},

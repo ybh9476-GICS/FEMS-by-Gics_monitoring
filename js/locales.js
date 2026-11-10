@@ -98,6 +98,9 @@ UPS 대시보드 예시 · 좌우 스크롤¦Sample UPS dashboard · Scroll hori
 계약 전력¦Contract power¦契約電力
 유효 전력¦Active power¦有効電力
 부하율¦Load factor¦負荷率
+계약 전력(kW)¦Contract power (kW)¦契約電力(kW)
+유효 전력(kW)¦Active power (kW)¦有効電力(kW)
+부하율(%)¦Load factor (%)¦負荷率(%)
 일간 발전량¦Daily generation¦日間発電量
 일간 발전 시간¦Daily generation hours¦日間発電時間
 입력 전력¦Input power¦入力電力
@@ -105,6 +108,16 @@ UPS 대시보드 예시 · 좌우 스크롤¦Sample UPS dashboard · Scroll hori
 일간 충전량¦Daily charge energy¦日間充電量
 일간 방전량¦Daily discharge energy¦日間放電量
 일간 효율¦Daily efficiency¦日間効率
+일간 발전량(kWh)¦Daily generation (kWh)¦日間発電量(kWh)
+일간 발전 시간(h)¦Daily generation hours (h)¦日間発電時間(h)
+입력 전력(kW)¦Input power (kW)¦入力電力(kW)
+출력 전력(kW)¦Output power (kW)¦出力電力(kW)
+일간 충전량(kWh)¦Daily charge energy (kWh)¦日間充電量(kWh)
+일간 방전량(kWh)¦Daily discharge energy (kWh)¦日間放電量(kWh)
+일간 효율(%)¦Daily efficiency (%)¦日間効率(%)
+입력 전압(Vac)¦Input voltage (Vac)¦入力電圧(Vac)
+출력 전압(Vac)¦Output voltage (Vac)¦出力電圧(Vac)
+배터리(%)¦Battery (%)¦バッテリー(%)
 입력¦Input¦入力
 출력¦Output¦出力
 배터리¦Battery¦バッテリー

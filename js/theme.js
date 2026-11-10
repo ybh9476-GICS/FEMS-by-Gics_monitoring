@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   // This blocking head script runs before styles and before the body is parsed.
-  // Theme preferences are separate from project data and the 3D renderer.
+  // Theme preferences are separate from project data; renderers subscribe to theme changes.
   const key='fems-ui-theme',root=document.documentElement;
   const normalize=value=>value==='dark'?'dark':'light';
   let mode='light';
