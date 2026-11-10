@@ -1,10 +1,65 @@
 /* All rules are opt-in: the editor's layout and controls keep their own styles. */
+#monitor-header{display:none}
+body[data-workspace-mode=monitoring] #monitor-header{display:flex;align-items:center;gap:18px;min-width:0}
+body[data-workspace-mode=monitoring] .file-actions{align-items:center;margin-left:auto;gap:8px}
+.monitor-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.monitor-weather{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted);white-space:nowrap}
+.monitor-weather svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.monitor-weather-condition{display:flex;align-items:center}
+.monitor-weather-condition svg{display:none;width:24px;height:24px}
+[data-weather=clear-day] [data-weather-icon=clear-day],[data-weather=clear-night] [data-weather-icon=clear-night],[data-weather=cloudy] [data-weather-icon=cloudy],[data-weather=rain] [data-weather-icon=rain],[data-weather=snow] [data-weather-icon=snow],[data-weather=unavailable] [data-weather-icon=unavailable]{display:block}
+.monitor-weather-value{display:flex;align-items:center;gap:5px;font-variant-numeric:tabular-nums}
+#monitor-clock{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+.dashboard-comparisons b.mock-increase{color:#b86b57}
+:root[data-theme=dark] .dashboard-comparisons b.mock-increase{color:#e6a38d}
+#monitor-play-toggle .monitor-stop-icon,#monitor-play-toggle[aria-pressed=true] .monitor-play-icon{display:none}
+#monitor-play-toggle[aria-pressed=true] .monitor-stop-icon{display:block}
+#monitor-alerts-dialog{width:min(680px,calc(100vw - 32px));max-width:none;max-height:min(640px,calc(100dvh - 40px));padding:0;border:1px solid var(--line);border-radius:14px;background:var(--ui-panel,#fff);color:var(--ui-text,#344f55);box-shadow:0 18px 60px #0004;overflow:hidden}
+#monitor-alerts-dialog[open]{display:flex;flex-direction:column}
+#monitor-alerts-dialog::backdrop{background:#07121680}
+.monitor-alerts-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 18px;border-bottom:1px solid var(--line);flex-shrink:0}
+.monitor-alerts-heading h2{margin:0;font-size:20px}
+.monitor-alerts-heading .icon-button{width:32px;height:32px;padding:6px;flex-shrink:0}
+.monitor-alerts-body{display:flex;flex-direction:column;gap:10px;min-height:0;padding:12px 18px}
+.monitor-alerts-legend{display:flex;align-items:center;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+#monitor-alerts-read-all{margin-left:auto;padding:5px 9px;font-size:12px;border:1px solid var(--line);border-radius:6px}
+#monitor-alerts-open{position:relative;overflow:visible}
+#monitor-alerts-badge{position:absolute;top:-5px;right:-6px;min-width:18px;height:18px;box-sizing:border-box;padding:0 4px;border-radius:10px;background:#d63e45;color:#fff;font-size:10px;font-weight:700;line-height:18px;text-align:center;pointer-events:none}
+.monitor-alert-severity{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;white-space:nowrap;color:var(--ui-text,#344f55)}
+.monitor-alert-severity i{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:#e6b52c}
+.monitor-alert-severity[data-severity=danger] i{background:#e55353}
+.monitor-alerts-filters{display:flex;gap:10px;flex-wrap:wrap}
+.monitor-alerts-filters label{display:flex;flex:1;min-width:140px;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+.monitor-alerts-filters select{width:100%;padding:6px 8px;font-size:12px;border:1px solid var(--line);border-radius:6px}
+#monitor-alerts-count{margin:0;font-size:12px;color:var(--muted)}
+.monitor-alerts-table-wrap{overflow:auto;min-height:0;border:1px solid var(--line);border-radius:8px}
+.monitor-alerts-table{width:100%;border-collapse:collapse;text-align:left;font-size:12px}
+.monitor-alerts-table th{position:sticky;top:0;background:var(--ui-raised,#f0f5f3);color:var(--muted);font-weight:600;z-index:1}
+.monitor-alerts-table th,.monitor-alerts-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.monitor-alerts-table tbody tr:last-child td{border-bottom:0}
+.monitor-alerts-table th:first-child,.monitor-alerts-table th:nth-child(2),.monitor-alerts-table th:last-child{width:32px;white-space:nowrap}
+.monitor-alerts-table td:first-child,.monitor-alerts-table th:first-child,.monitor-alerts-table td:nth-child(2),.monitor-alerts-table th:nth-child(2),.monitor-alerts-table td:last-child{text-align:center;padding-left:6px;padding-right:6px}
+.monitor-alerts-table .monitor-alert-severity i{width:14px;height:14px}
+.monitor-alerts-table th:nth-child(3){width:140px;white-space:nowrap}
+.monitor-alerts-table time{font-variant-numeric:tabular-nums;white-space:nowrap}
+.monitor-alerts-table td:nth-child(4){min-width:190px;overflow-wrap:anywhere}
+.monitor-alerts-table .icon-button{width:28px;height:28px;padding:5px;border:0;border-radius:5px}
+.monitor-alerts-table .is-read{color:#97a5a6}
+.monitor-alerts-table .is-read p{color:inherit}
+:root .monitor-alerts-table .is-read .monitor-alert-read{color:inherit}
+:root[data-theme=dark] .monitor-alerts-table .is-read{color:#6e858b}
+.monitor-alerts-table strong{font-size:12px;font-weight:600}
+.monitor-alerts-table p{margin:2px 0 0;line-height:1.4;color:var(--muted)}
+#monitor-alerts-empty{margin:0;padding:24px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:650px){.monitor-alerts-heading{padding:12px}.monitor-alerts-body{padding:12px;gap:10px}}
+@media(max-width:900px){body[data-workspace-mode=monitoring] .brand{min-width:0}body[data-workspace-mode=monitoring] .brand small{display:none}body[data-workspace-mode=monitoring] #monitor-header{gap:10px}.monitor-weather{gap:7px}}
+@media(max-width:650px){body[data-workspace-mode=monitoring] .topbar{height:84px;flex-wrap:wrap;gap:0;padding:6px 12px}body[data-workspace-mode=monitoring] .topbar>.brand{width:100%;height:30px}body[data-workspace-mode=monitoring] .topbar>.file-actions{width:100%;justify-content:flex-end}body[data-workspace-mode=monitoring] main.workspace{height:calc(100dvh - 84px)}body[data-workspace-mode=monitoring] #monitor-header{flex:1;justify-content:space-between;gap:6px}.monitor-weather{gap:5px;font-size:11px}#monitor-clock{font-size:11px}}
 #monitor-dashboard,#monitor-details{display:none}
 body[data-workspace-mode=monitoring] .workspace{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden;min-height:400px}
-/* Only the middle row shares its width with details; toolbar and dashboard span both columns. */
+/* Details sit beside the toolbar and viewport; the dashboard keeps the full width. */
 body[data-workspace-mode=monitoring] .editor{grid-column:1;grid-row:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) 0px;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;transition:grid-template-columns .22s ease}
 body[data-workspace-mode=monitoring].monitor-details-open .editor{grid-template-columns:minmax(0,1fr) min(var(--right-width,var(--right-default)),40vw)}
-body[data-workspace-mode=monitoring] .editor-toolbar{grid-column:1 / -1;grid-row:1}
+body[data-workspace-mode=monitoring] .editor-toolbar{grid-column:1;grid-row:1;min-width:0}
 body[data-workspace-mode=monitoring] .viewport{grid-column:1;grid-row:2;min-width:0}
 body[data-workspace-mode=monitoring] :is(.catalog-panel,.inspector,.panel-resizer,.equipment-dock,.statusbar,.alignment-tools,#undo,#redo,.history-tools .divider,#empty-state,#catalog-tooltip),
 body[data-workspace-mode=monitoring] .file-actions > button:not(#settings-open){display:none!important}
@@ -57,8 +112,16 @@ body[data-workspace-mode=monitoring] #monitor-dashboard{display:flex;flex-direct
 .dashboard-bar-row>span{width:22px;flex-shrink:0}.dashboard-bar-row>b{font-size:9px;font-weight:450;width:40px;text-align:right}
 .dashboard-bar-track{flex:1;height:10px;background:#f3f6f4;border-radius:2px;overflow:hidden}.dashboard-bar-track i{display:block;height:100%;border-radius:2px}.bar-0{background:#3ba78b}.bar-1{background:#dfb766}.bar-2{background:#d8898c}
 .emissions-card{flex-basis:310px}.emissions-card dl{margin:5px 0 0;display:flex;flex-direction:column;flex:1}.emissions-card dl>div{display:flex;justify-content:space-between;align-items:center;gap:16px;flex:1;border-bottom:1px solid #edf1ee}.emissions-card dl>div:last-child{border-bottom:0}.emissions-card dt{font-size:11px;color:#7d9387;white-space:nowrap}.emissions-card dt span{font-size:10px}.emissions-card dd{margin:0;white-space:nowrap}.emissions-card dd strong{font-size:21px;font-weight:600;letter-spacing:-.4px}.emissions-card .dashboard-unit{font-size:10px}
-body[data-workspace-mode=monitoring] #monitor-details{display:block;grid-column:2;grid-row:2;min-height:0;width:min(var(--right-width,var(--right-default)),40vw);background:#fff;border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .22s ease,visibility .22s;z-index:20}
+body[data-workspace-mode=monitoring] #monitor-details{display:block;grid-column:2;grid-row:1 / 3;min-height:0;width:min(var(--right-width,var(--right-default)),40vw);background:#fff;border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .22s ease,visibility .22s;z-index:20}
 body[data-workspace-mode=monitoring].monitor-details-open #monitor-details{transform:translateX(0);visibility:visible}
+#monitor-details{overflow-y:auto;color:#24463f}
+#monitor-details .panel-heading{padding:14px 18px 10px}
+.monitor-details-name{display:flex;align-items:center;gap:7px;min-width:0;margin:0;font-size:14px;font-weight:650;line-height:1.5}
+.monitor-details-name>span:last-child{min-width:0;overflow-wrap:anywhere}
+.monitor-details-metrics{margin:0;padding:0 18px 18px;font-size:12px}
+.monitor-details-metrics>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.monitor-details-metrics dt{min-width:0;overflow-wrap:anywhere;color:var(--muted)}
+.monitor-details-metrics dd{margin:0;flex-shrink:0;font-weight:600;font-variant-numeric:tabular-nums}
 body[data-workspace-mode=monitoring] .schematic-edge{pointer-events:none}
 @media(max-width:760px){body[data-workspace-mode=monitoring] .workspace{height:calc(100dvh - 52px);min-height:400px}body[data-workspace-mode=monitoring] #monitor-dashboard{height:224px;padding-inline:8px}.monitor-dashboard-header{flex-wrap:wrap}}
 @media(max-height:650px){body[data-workspace-mode=monitoring] #monitor-dashboard{height:192px}.dashboard-card{padding:9px 12px}.dashboard-gauge svg,.peak-gauge{height:100px;min-height:75px}.gauge-value{bottom:8px}.gauge-value strong{font-size:28px}.dashboard-total{padding:2px 0 5px}.dashboard-total strong{font-size:24px;line-height:27px}.dashboard-bars{padding-top:8px;gap:5px}.hourly-chart{min-height:95px}}

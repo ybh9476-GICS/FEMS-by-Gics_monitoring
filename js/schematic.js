@@ -12,7 +12,7 @@
   class Schematic {
     constructor(host,api){
       this.host=host;this.api=api;this.scale=1;this.offset={x:0,y:0};this.active=false;
-      host.innerHTML='<div class="schematic-tools"><strong>전력 계통도</strong><div class="schematic-filters"><input type="search" aria-label="계통도 설비 검색" placeholder="설비 이름 · 코드 · 공간 검색"><label><input type="checkbox">선택 설비의 직접 연결만</label><button type="button" class="schematic-locate" disabled>배치에서 보기 ↗</button></div></div><div class="schematic-canvas"><svg role="group" aria-label="설비 전력 연결 관계도" tabindex="0"></svg><div class="schematic-empty" hidden></div></div>';
+      host.innerHTML='<div class="schematic-tools"><div class="schematic-filters"><input type="search" aria-label="계통도 설비 검색" placeholder="설비 이름 · 코드 · 공간 검색"><label><input type="checkbox">선택 설비의 직접 연결만</label><button type="button" class="schematic-locate" disabled>배치에서 보기 ↗</button></div></div><div class="schematic-canvas"><svg role="group" aria-label="설비 전력 연결 관계도" tabindex="0"></svg><div class="schematic-empty" hidden></div></div>';
       this.search=host.querySelector('input[type=search]');this.neighbors=host.querySelector('input[type=checkbox]');this.locate=host.querySelector('.schematic-locate');this.canvas=host.querySelector('.schematic-canvas');this.svg=host.querySelector('svg');this.empty=host.querySelector('.schematic-empty');
       this.search.addEventListener('input',()=>{this.key=null;this.draw();this.fit(true);});this.neighbors.addEventListener('change',()=>{this.key=null;this.draw();this.fit(true);});
       this.locate.addEventListener('click',()=>{if(this.selected)this.api.locate(this.selected);});
@@ -34,7 +34,7 @@
       if(key!==this.key){this.key=key;this.layout=L.layout(filtered);this.svg.replaceChildren();const defs=svg('defs');for(const color of new Set(this.layout.edges.flatMap(e=>e.bands.map(b=>b.color)))){const marker=svg('marker',{id:'schematic-arrow-'+color.slice(1),viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse',markerUnits:'userSpaceOnUse'});marker.append(svg('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:color}));defs.append(marker);}this.svg.append(defs);this.world=svg('g');this.svg.append(this.world);this.edgeElements=new Map();this.nodeElements=new Map();
         for(let rank=0;rank<this.layout.columns;rank++)this.world.append(svg('text',{x:32+rank*346,y:Math.min(...this.layout.nodes.filter(n=>n.rank===rank).map(n=>n.y))-16,class:'schematic-column'},'연결 단계 '+(rank+1)));
         const names=new Map(graph.nodes.map(n=>[n.id,n.name]));
-        for(const e of this.layout.edges){const group=svg('g',{'data-edge':e.id,class:'schematic-edge '+e.kind,tabindex:this.readOnly?-1:0,role:'button','aria-label':names.get(e.from)+' → '+names.get(e.to)+' · '+(e.kind==='hierarchy'?'계층 연결':'추가 연결')});group.append(svg('title',{},group.getAttribute('aria-label')),svg('path',{d:e.path,class:'schematic-edge-hit'}));const parts=L.coloredSegments(e.points,e.bands);parts.forEach((part,index)=>group.append(svg('path',{d:part.path,class:'schematic-edge-line',stroke:part.color,'stroke-dashoffset':-part.offset,...(index===parts.length-1?{'marker-end':'url(#schematic-arrow-'+part.color.slice(1)+')'}:{})})));
+        for(const e of this.layout.edges){const group=svg('g',{'data-edge':e.id,class:'schematic-edge '+e.kind,tabindex:this.readOnly?-1:0,role:'button','aria-label':names.get(e.from)+' → '+names.get(e.to)+' · '+(e.kind==='hierarchy'?'계층 연결':'추가 연결')});group.append(svg('title',{},group.getAttribute('aria-label')),svg('path',{d:e.path,class:'schematic-edge-hit'}));const parts=L.coloredSegments(e.points,e.bands);parts.forEach((part,index)=>group.append(svg('path',{d:part.path,class:'schematic-edge-line',stroke:part.color,'stroke-dashoffset':-part.offset,style:'--schematic-dash-offset:'+(-part.offset)+'px',...(index===parts.length-1?{'marker-end':'url(#schematic-arrow-'+part.color.slice(1)+')'}:{})})));
           const choose=()=>{if(this.readOnly)return;if(this.moved){this.moved=false;return;}this.edge=e.id;this.highlight();};group.addEventListener('click',choose);group.addEventListener('keydown',event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();event.stopPropagation();this.moved=false;choose();}});this.world.append(group);this.edgeElements.set(e.id,group);}
         for(const n of this.layout.nodes){const g=this.createCard(n);
           const choose=()=>{this.edge=null;this.api.select(n.id);this.nodeElements.get(n.id)?.focus({preventScroll:true});};g.addEventListener('click',choose);g.addEventListener('keydown',e=>{if(['Enter',' '].includes(e.key)){e.preventDefault();e.stopPropagation();choose();}});this.world.append(g);this.nodeElements.set(n.id,g);}
@@ -49,7 +49,7 @@
       const g=svg('g',{transform:`translate(${n.x} ${n.y})`,'data-node':n.id,'data-stage':n.rank+1,'data-tone':n.rank%8,class:'schematic-node',...(!this.readOnly&&systemSite?{'data-i18n-site-suffix':n.space}:{}),tabindex:0,role:'button','aria-label':this.readOnly?n.name:n.name+' · '+n.space});
       g.append(this.readOnly?svg('title',{'data-i18n-skip':''},n.name):nodeTitle(n,systemSite),svg('rect',{class:'schematic-card',width:n.width,height:n.height,rx:10}),svg('rect',{class:'schematic-card-accent',x:this.readOnly?8:6,y:this.readOnly?12:10,width:4,height:this.readOnly?10:n.height-20,rx:this.readOnly?1:2,'aria-hidden':true}),svg('text',{x:18,y:this.readOnly?22:25,class:'schematic-node-name'},this.shorten(n.name,22)));
       if(this.readOnly){
-        // Match the billboard until live measurements are connected.
+        // Captions and mock readings match the 3D/plan billboards.
         root.FEMSCatalog.billboardMetrics(n.type).forEach((caption,index)=>{
           const y=42+index*12;
           g.append(svg('text',{x:18,y:y-3,class:'schematic-node-metric','data-i18n-ui':''},caption),svg('text',{x:n.width-16,y,class:'schematic-node-metric','text-anchor':'end'},'—'));
@@ -64,6 +64,9 @@
       for(const [id,g] of this.nodeElements){
         const reported=this.api.communicationStatus?.(id),status=reported==='normal'||reported==='error'?reported:'disconnected';
         g.setAttribute('data-communication-status',status);
+        const values=root.FEMSMonitoringMock?.values({id});
+        const nodes=Array.from(g.children).filter(e=>e.getAttribute('text-anchor')==='end');
+        nodes.forEach((node,index)=>{const text=values?.[index]??'—';if(node.textContent!==text)node.textContent=text;});
       }
     }
     shorten(text,max){let result='',width=0;for(const char of Array.from(text)){width+=char.codePointAt(0)>255?2:1;if(width>max)return result+'…';result+=char;}return result;}

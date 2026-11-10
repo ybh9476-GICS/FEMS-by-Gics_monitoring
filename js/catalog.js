@@ -1,7 +1,7 @@
 (function (root) {
   'use strict';
   const catalog = [
-    { type: 'tower', name: '송전탑', en: 'Transmission tower', code: 'GRID', group: '수전·배전', color: '#71869a', width: 3.6, depth: 3.6, height: 12, description: '한전 등 외부 전력망과 연결되는 고압·중압 전력 공급을 표현합니다.' },
+    { type: 'tower', name: 'GRID', en: 'GRID', code: 'GRID', group: '수전·배전', color: '#71869a', width: 3.6, depth: 3.6, height: 12, description: '한전 등 외부 전력망과 연결되는 고압·중압 전력 공급을 표현합니다.' },
     { type: 'receiving', name: '수전반', en: 'Incoming switchgear', code: 'SW', group: '수전·배전', color: '#496a8d', width: 2.4, depth: 1.2, height: 2.4, description: '외부에서 들어오는 전력을 받아 차단·보호하는 설비입니다.' },
     { type: 'transformer', name: '변압기', en: 'Transformer', code: 'TR', group: '수전·배전', color: '#b68a4d', width: 2.4, depth: 1.8, height: 2.4, description: '공급 전압을 설비에 필요한 전압으로 변환합니다.' },
     { type: 'distribution', name: '저압 배전반', en: 'LV switchboard', code: 'LV', group: '수전·배전', color: '#4c8397', width: 2.4, depth: 0.9, height: 2.2, description: '변압기에서 받은 저압 전력을 여러 계통으로 배분합니다.' },

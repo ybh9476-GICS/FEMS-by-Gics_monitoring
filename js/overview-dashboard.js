@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  // Presentation fixtures only: no telemetry, project writes or persistence.
+  // Initial presentation; the shared mock snapshot updates values without replacing the panels.
   const host=document.getElementById('monitor-dashboard-content');
   const tools=document.getElementById('monitor-dashboard-tools');
   const left=document.getElementById('dashboard-scroll-left'),right=document.getElementById('dashboard-scroll-right');
@@ -84,6 +84,6 @@
   },{passive:false});
   new ResizeObserver(update).observe(panel);
   }
-  root.FEMSOverviewDashboard={show(name){active=panels[name]||null;for(const panel of Object.values(panels))panel.hidden=panel!==active;tools.hidden=!active;requestAnimationFrame(update);}};
+  root.FEMSOverviewDashboard={renderMock(snapshot){root.FEMSMonitoringDashboard?.render(panels,snapshot,root.FEMSMonitoringMock?.equipment||[]);update();},show(name){active=panels[name]||null;for(const panel of Object.values(panels))panel.hidden=panel!==active;tools.hidden=!active;requestAnimationFrame(update);}};
   update();
 })(window);

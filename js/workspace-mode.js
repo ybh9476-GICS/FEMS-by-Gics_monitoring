@@ -41,12 +41,34 @@
       chooseDashboard(next.dataset.dashboard);next.focus();
     });
   }
-  function selection(selected){
-    const open=mode==='monitoring'&&!!selected;
+  function renderDetails(item,equipment,reported){
+    details.replaceChildren();
+    if(!item||typeof item!=='object')return;
+    const heading=document.createElement('div'),title=document.createElement('h2'),name=document.createElement('span');
+    heading.className='panel-heading';title.className='monitor-details-name';name.textContent=item.name;name.setAttribute('data-i18n-skip','');
+    if(equipment){
+      const status=document.createElement('span'),value=reported==='normal'||reported==='error'?reported:'disconnected';
+      const caption={normal:'통신 정상',error:'통신 에러',disconnected:'통신 연결 끊김'}[value];
+      status.className='communication-status communication-status-'+value;status.setAttribute('role','img');status.setAttribute('aria-label',caption);status.setAttribute('title',caption);title.append(status);
+    }
+    title.append(name);heading.append(title);details.append(heading);
+    if(!equipment)return;
+    const metrics=document.createElement('dl');metrics.className='monitor-details-metrics';
+    const readings=root.FEMSMonitoringMock?.values(item);
+    for(const [index,caption] of root.FEMSCatalog.billboardMetrics(item.type).entries()){
+      const row=document.createElement('div'),term=document.createElement('dt'),value=document.createElement('dd');
+      term.setAttribute('data-i18n-ui','');term.textContent=caption;value.textContent=readings?.[index]??'—';row.append(term,value);metrics.append(row);
+    }
+    details.append(metrics);
+  }
+  function selection(selected,equipment=false,reported){
+    const open=mode==='monitoring'&&!!selected&&equipment;
+    renderDetails(open?selected:null,equipment,reported);
     document.body.classList.toggle('monitor-details-open',open);
     details.inert=!open;details.setAttribute('aria-hidden',String(!open));
   }
   const api={get mode(){return mode;},configure(value){adapter=value;},selection,renderDashboard,
+    locateEquipment(id){return mode==='monitoring'&&adapter?.locateEquipment?.(id)===true;},
     setMode(next){
       if(!adapter||!['editor','monitoring'].includes(next)||next===mode)return false;
       if(adapter.beforeChange(next)===false)return false;
@@ -59,7 +81,7 @@
       if(mode==='editor')priorInert.clear();
       selection(false);
       for(const button of document.querySelectorAll('[data-workspace-mode]'))button.setAttribute('aria-pressed',String(button.dataset.workspaceMode===mode));
-      adapter.afterChange(next);return true;
+      adapter.afterChange(next);root.dispatchEvent(new CustomEvent('fems-workspace-mode-change',{detail:{mode}}));return true;
     }
   };
   root.FEMSWorkspaceMode=api;

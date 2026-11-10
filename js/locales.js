@@ -2,7 +2,68 @@
   'use strict';
   // Korean source copy is the stable key. {0}, {1} are opaque names/numbers, never translated.
   const data=`
+상태¦Status¦状態
+모든 종류¦All types¦すべての種類
+설비 종류순¦Equipment type¦設備種類順
+알림¦Notifications¦通知
+읽음¦Read¦既読
+전체 읽음¦Mark all as read¦すべて既読にする
+읽음으로 표시¦Mark as read¦既読にする
+안 읽음으로 표시¦Mark as unread¦未読にする
+설비로 이동¦Go to equipment¦設備へ移動
+이동¦Go¦移動
+목업 알림 이력¦Mock notification history¦モック通知履歴
+알림 닫기¦Close notifications¦通知を閉じる
+목업 재생 중에 알림을 확인할 수 있습니다.¦Notifications are available while the mock is playing.¦モック再生中に通知を確認できます。
+알림 상태 범례¦Notification status legend¦通知ステータスの凡例
+알림 상태¦Notification status¦通知ステータス
+위험¦Danger¦危険
+경고¦Warning¦警告
+설비¦Equipment¦設備
+모든 상태¦All statuses¦すべてのステータス
+모든 설비¦All equipment¦すべての設備
+정렬¦Sort¦並び替え
+최신순¦Newest first¦新しい順
+위험 우선¦Danger first¦危険を優先
+설비 이름순¦Equipment name¦設備名順
+발생 시간¦Occurred at¦発生日時
+알림 내용¦Notification details¦通知内容
+표시할 알림이 없습니다.¦No notifications to display.¦表示する通知はありません。
+표시 {0}건 / 전체 {1}건¦Showing {0} of {1}¦全{1}件中{0}件表示
+수전 전력 과부하가 감지되었습니다. 부하 분산이 필요합니다.¦Incoming power overload detected. Load distribution is required.¦受電電力の過負荷を検知しました。負荷の分散が必要です。
+수전 전압 편차가 감지되었습니다. 전원 상태를 점검하세요.¦Incoming voltage deviation detected. Check the power supply.¦受電電圧の偏差を検知しました。電源の状態を点検してください。
+배터리 온도 상한 초과가 감지되었습니다. 냉각 상태를 점검하세요.¦Battery temperature limit exceeded. Check the cooling system.¦バッテリー温度の上限超過を検知しました。冷却状態を点検してください。
+배터리 잔량 저하가 감지되었습니다. 충전 계획을 확인하세요.¦Low battery charge detected. Review the charging schedule.¦バッテリー残量の低下を検知しました。充電計画を確認してください。
+UPS 출력 과부하가 감지되었습니다. 연결 부하를 점검하세요.¦UPS output overload detected. Check connected loads.¦UPS出力の過負荷を検知しました。接続負荷を点検してください。
+UPS 배터리 점검이 필요합니다. 배터리 상태를 확인하세요.¦UPS battery inspection required. Check the battery condition.¦UPSバッテリーの点検が必要です。バッテリーの状態を確認してください。
+인버터 보호 정지 이력이 발생했습니다. 인버터 상태를 점검하세요.¦An inverter protection stop was recorded. Check the inverter.¦インバーターの保護停止が記録されました。状態を点検してください。
+태양광 발전 효율 저하가 감지되었습니다. 패널 상태를 점검하세요.¦Reduced solar generation efficiency detected. Check the panels.¦太陽光発電効率の低下を検知しました。パネルの状態を点検してください。
+과전류가 감지되었습니다. 설비 부하와 보호 장치를 점검하세요.¦Overcurrent detected. Check equipment loads and protection devices.¦過電流を検知しました。設備負荷と保護装置を点検してください。
+운전 전류 편차가 감지되었습니다. 설비 상태를 점검하세요.¦Operating current deviation detected. Check the equipment.¦運転電流の偏差を検知しました。設備の状態を点検してください。
 설정¦Settings¦設定
+관제 상태¦Monitoring status¦監視状態
+목업 재생 중¦Mock running¦モック再生中
+목업 정지¦Mock stopped¦モック停止
+목업 데이터¦Mock data¦モックデータ
+전국 날씨 목업 · 맑음 (낮)¦National weather mock · Clear (day)¦全国天気モック · 晴れ（昼）
+전국 날씨 목업 · 맑음 (밤)¦National weather mock · Clear (night)¦全国天気モック · 晴れ（夜）
+전국 날씨 목업 · 흐림¦National weather mock · Cloudy¦全国天気モック · 曇り
+전국 날씨 목업 · 비¦National weather mock · Rain¦全国天気モック · 雨
+전국 날씨 목업 · 눈¦National weather mock · Snow¦全国天気モック · 雪
+날씨¦Weather¦天気
+온도¦Temperature¦温度
+습도¦Humidity¦湿度
+날씨 정보 없음¦Weather unavailable¦天気情報なし
+부산 사하구 · 날씨 정보 없음¦Saha-gu, Busan · Weather unavailable¦釜山沙下区 · 天気情報なし
+부산 사하구 · 맑음 (낮)¦Saha-gu, Busan · Clear (day)¦釜山沙下区 · 晴れ（昼）
+부산 사하구 · 맑음 (밤)¦Saha-gu, Busan · Clear (night)¦釜山沙下区 · 晴れ（夜）
+부산 사하구 · 흐림¦Saha-gu, Busan · Cloudy¦釜山沙下区 · 曇り
+부산 사하구 · 비¦Saha-gu, Busan · Rain¦釜山沙下区 · 雨
+부산 사하구 · 눈¦Saha-gu, Busan · Snow¦釜山沙下区 · 雪
+현재 시간¦Current time¦現在時刻
+한국 표준시 (KST)¦Korea Standard Time (KST)¦韓国標準時（KST）
+재생¦Play¦再生
+정지¦Stop¦停止
 설정 닫기¦Close settings¦設定を閉じる
 파일 선택¦Choose file¦ファイルを選択
 선택된 파일 없음¦No file selected¦ファイルが選択されていません
@@ -344,6 +405,7 @@ Y 높이 (m)¦Y elevation (m)¦Y高さ (m)
 {0} → {1} · 계층 연결¦{0} → {1} · Hierarchy connection¦{0} → {1}・階層接続
 {0} → {1} · 추가 연결¦{0} → {1} · Additional connection¦{0} → {1}・追加接続
 송전탑¦Transmission tower¦送電鉄塔
+GRID¦GRID¦GRID
 수전반¦Incoming switchgear¦受電盤
 변압기¦Transformer¦変圧器
 저압 배전반¦LV switchboard¦低圧配電盤
@@ -969,7 +1031,7 @@ PNG 또는 JPEG 텍스처를 GLB 안에 포함하세요.¦Embed PNG or JPEG text
 `;
   const entries=data.trim().split('\n').filter(Boolean).map(line=>line.split('¦'));
   for(const row of [...entries])if(/^\d\d /.test(row[0])&&row[0].includes(':'))entries.push([row[0]+' — 이미지 확대',row[1]+' — Enlarge image',row[2]+' — 画像を拡大']);
-  const equipment=['송전탑','수전반','변압기','저압 배전반','분전반','태양광 패널','태양광 패널 2×2','태양광 패널 3×3'];
+  const equipment=['GRID','송전탑','수전반','변압기','저압 배전반','분전반','태양광 패널','태양광 패널 2×2','태양광 패널 3×3'];
   for(const row of [...entries])if(equipment.includes(row[0])){entries.push([row[0]+' 배치','Place '+row[1],row[2]+' を配置']);entries.push([row[0]+' · '+row[1],row[1],row[2]]);}
   for(const row of [...entries,...[['x','X','X'],['z','Z','Z'],['width','Width','幅'],['depth','Depth','奥行き'],['height','Height','高さ']]])if(['도면 이름','프로젝트 이름','대지 이름','설비 이름','설비 ID','층 ID','상위 설비 ID','공간 ID','건물 ID','프로젝트 ID','이름','층 번호','대지 가로','대지 세로','부지 가로','부지 세로','X 좌표','Z 좌표','회전','가로','세로','높이','건물 높이','옥상 바닥 높이','층 배치 높이','층 크기','x','z','width','depth','height'].includes(row[0])){
     entries.push([row[0]+': 1~{0}자로 입력하세요.',row[1]+': enter 1–{0} characters.',row[2]+': 1～{0}文字で入力してください。']);

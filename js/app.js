@@ -233,6 +233,7 @@
   }
   function render(preserveInputs=false){
     syncProject();const state=history.current;
+    window.FEMSMonitoringMock?.configure(state);
     if(!state.equipment.some(e=>e.id===selected))selected=null;
     selectedIds=selected?[selected]:selectedIds.filter(id=>state.equipment.some(e=>e.id===id));if(selectedIds.length===1)selected=selectedIds[0];
     const warnings=M.overlaps(state),display=spaces?spaces.display(state):state;
@@ -246,7 +247,7 @@
     if(!preserveInputs)renderInspector();
     if(tree){tree.projectSelected=projectSelected;tree.render(S?S.treeState(state):state,spaces?.selected||selected,false,spaces?.selected?[spaces.selected]:selectedIds);}
     links?.render(view);spaces?.render(preserveInputs);siteProperties?.render();
-    globalThis.FEMSWorkspaceMode?.selection(!!selected||!!S.get(state,spaces?.selected));
+    globalThis.FEMSWorkspaceMode?.selection(state.equipment.find(item=>item.id===selected)||S.get(state,spaces?.selected),!!selected,scene?.handlers.communicationStatus?.(selected));
     globalThis.FEMSWorkspaceMode?.renderDashboard(state);
     if(scene&&view!=='schematic'){scene.groupPivot=!spaces?.selected&&selectedIds.length>1?currentGroup():null;scene.connectionSelection=links?.selection;scene.setState(display,spaces?.selected||selected,warnings,spaces?.selected?[spaces.selected]:selectedIds.filter(id=>display.equipment.some(e=>e.id===id)));}
     schematic?.setState(state,selected);
@@ -315,7 +316,7 @@
     if(changed)toast(commit?'설비 위치를 변경했습니다.':'설비 이동을 취소했습니다.');
   }
   $('gizmo-rotate').addEventListener('click',rotate);
-  try{scene=new window.FEMSScene($('scene'),$('labels'),{select:selectInScene,navigateEquipment:id=>{const target=history.current.equipment.find(e=>e.id===id),floor=history.current.floors?.find(f=>f.id===target?.floorId);if(!target)return;if(spaces)spaces.context=floor?{floorId:floor.id,buildingId:floor.buildingId}:{};select(id);if(globalThis.FEMSWorkspaceMode?.mode==='monitoring')return;scene?.fit();const item=scene?.state?.equipment.find(e=>e.id===id);if(item){scene.target.set(item.x,(item.y||0)+item.height/2,item.z);scene.updateCamera();}},selectLabel:(id,event)=>selectInScene(id,event,true),place:add,move:(id,pos)=>{selected=id;changeSelected(pos,'설비 위치를 변경했습니다.');},gizmoStart:startGizmo,gizmoPreview:previewGizmo,gizmoEnd:finishGizmo,connectionSelect:hit=>{spaces?.clear();finishPropertyEdit();projectSelected=false;selected=null;selectedIds=[];const selection=links.select(hit);render();return selection;},connectionStart:hit=>links.start(hit),connectionPreview:(pos,options)=>links.preview(pos,options),connectionEnd:ok=>links.finish(ok),error:graphicsError},$('gizmo-rotate'));}
+  try{scene=new window.FEMSScene($('scene'),$('labels'),{communicationStatus:id=>window.FEMSMonitoringMock?.status(id),select:selectInScene,navigateEquipment:id=>{const target=history.current.equipment.find(e=>e.id===id),floor=history.current.floors?.find(f=>f.id===target?.floorId);if(!target)return;if(spaces)spaces.context=floor?{floorId:floor.id,buildingId:floor.buildingId}:{};select(id);if(globalThis.FEMSWorkspaceMode?.mode==='monitoring')return;scene?.fit();const item=scene?.state?.equipment.find(e=>e.id===id);if(item){scene.target.set(item.x,(item.y||0)+item.height/2,item.z);scene.updateCamera();}},selectLabel:(id,event)=>selectInScene(id,event,true),place:add,move:(id,pos)=>{selected=id;changeSelected(pos,'설비 위치를 변경했습니다.');},gizmoStart:startGizmo,gizmoPreview:previewGizmo,gizmoEnd:finishGizmo,connectionSelect:hit=>{spaces?.clear();finishPropertyEdit();projectSelected=false;selected=null;selectedIds=[];const selection=links.select(hit);render();return selection;},connectionStart:hit=>links.start(hit),connectionPreview:(pos,options)=>links.preview(pos,options),connectionEnd:ok=>links.finish(ok),error:graphicsError},$('gizmo-rotate'));}
   catch(error){graphicsError('3D 화면을 시작할 수 없습니다. WebGL 2를 지원하는 Edge 또는 Chrome에서 그래픽 가속을 확인하세요. 설비 목록과 속성 편집·파일 저장은 계속 사용할 수 있습니다.');}
   tree=new window.FEMSEquipmentTree($('equipment-tree'),$('equipment-search'),{select:(id,ids)=>select(id,ids,false,false,view==='schematic'&&history.current.equipment.some(e=>e.id===id)),selectProject:()=>select(null,[],true),reparent,error:toast,dropInfo:(ids,parentId)=>spaces?.dropInfo(ids,parentId)});
   schematic=new window.FEMSSchematic($('schematic'),{communicationStatus:id=>scene?.handlers.communicationStatus?.(id),select:id=>select(id,id?[id]:[],false,false,true),locate:id=>{const item=history.current.equipment.find(e=>e.id===id);if(!item)return;spaces?.focusFloor(item.floorId);setView('3d');select(id,[id],false,false,true);if(globalThis.FEMSWorkspaceMode?.mode!=='monitoring')scene?.fit({preserveAngle:true});}});
@@ -439,7 +440,20 @@
     disarm:()=>arm(null),selectEquipment:(id,ids,options)=>select(id,ids,false,false,!!options?.preserveSpace),registerAsset:(kind,callback)=>library.open(kind,callback),finishEquipmentEdit:finishPropertyEdit,
   });
   siteProperties=new window.FEMSSiteProperties({state:()=>history.current,selected:()=>spaces?.selected==='@site',commit});
+  window.addEventListener('fems-mock-update',()=>{
+    if(window.FEMSWorkspaceMode?.mode!=='monitoring')return;
+    const item=history.current.equipment.find(item=>item.id===selected);
+    window.FEMSWorkspaceMode.selection(item,!!item,window.FEMSMonitoringMock?.status(selected));
+    scene?.invalidate();if(schematic?.active)schematic.updateCommunication();
+    window.FEMSOverviewDashboard?.renderMock(window.FEMSMonitoringMock?.current);
+  });
   window.FEMSWorkspaceMode.configure({
+    locateEquipment(id){
+      const item=history.current.equipment.find(e=>e.id===id);if(!item)return false;
+      spaces?.focusFloor(item.floorId);
+      if(view==='schematic')setView('3d');
+      selectMonitoring(id);return true;
+    },
     beforeChange(next){
       if(fileBusy){toast('파일 작업이 끝난 뒤 모드를 전환하세요.');return false;}
       if(next==='monitoring'){

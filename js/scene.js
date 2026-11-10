@@ -395,7 +395,7 @@
         const title=document.createElement('span'),name=document.createElement('span'),status=document.createElement('span'),values=document.createElement('dl');
         title.className='equipment-info-name';values.className='equipment-info-values';
         status.setAttribute('role','img');title.append(status,name);
-        // No measurement source is connected yet. Never present demo numbers as live values.
+        // Readings are available only while the shared mock service is playing.
         for(const caption of root.FEMSCatalog.billboardMetrics(item.type)){
           const term=document.createElement('dt'),value=document.createElement('dd');
           term.setAttribute('data-i18n-ui','');term.textContent=caption;value.textContent='—';values.append(term,value);
@@ -403,6 +403,10 @@
         label.equipmentInfo={title,name,status,values,type:item.type};
       }
       const info=label.equipmentInfo;
+      const readings=root.FEMSMonitoringMock?.values(item);
+      for(let index=0;index<info.values.children.length/2;index++){
+        const value=info.values.children[index*2+1],text=readings?.[index]??'—';if(value.textContent!==text)value.textContent=text;
+      }
       if(info.name.textContent!==item.name)info.name.textContent=item.name;
       // Optional live-data adapter; an absent or unknown status must never imply a healthy connection.
       const reported=this.handlers.communicationStatus?.(item.id),status=reported==='normal'||reported==='error'?reported:'disconnected';

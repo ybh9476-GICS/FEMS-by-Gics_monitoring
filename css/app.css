@@ -51,4 +51,4 @@ body[data-workspace-mode=monitoring] .object-label.selected{z-index:1;pointer-ev
 .equipment-info-values{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;margin:0;padding:5px 8px;background:#e7efeb;border-top:1px solid #d5e1da;font-size:10px;line-height:1.2;font-weight:400}
 .equipment-info-values dt,.equipment-info-values dd{margin:0}
 .equipment-info-values dt{color:#617478}
-.equipment-info-values dd{font-variant-numeric:tabular-nums;font-weight:600}
+.equipment-info-values dd{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}

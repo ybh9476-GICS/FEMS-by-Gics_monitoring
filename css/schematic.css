@@ -5,7 +5,6 @@
 .editor.schematic-mode .scene-controls>div{pointer-events:auto}
 #schematic{position:absolute;inset:0;display:flex;flex-direction:column;background:#f7faf9;overflow:hidden;color:#344f55}
 .schematic-tools{display:flex;align-items:center;gap:16px;padding:12px 20px;background:#fff;border-bottom:1px solid #e0e9e5;flex-shrink:0;overflow-x:auto}
-.schematic-tools strong{flex-shrink:0;white-space:nowrap;font-size:15px;color:#244c43}
 .schematic-filters{display:flex;align-items:center;flex:1;gap:10px;min-width:0}
 .schematic-filters input[type=search]{flex:1;min-width:140px;max-width:240px;padding:7px 10px;font-size:11px}
 .schematic-filters label{display:flex;align-items:center;gap:5px;font-size:11px;white-space:nowrap}
@@ -39,7 +38,9 @@
 .schematic-node-space{font-size:10px;fill:#526571}
 .schematic-column{font-size:10px;fill:#94a59b;letter-spacing:1px}
 .schematic-edge{cursor:pointer;outline:none}
-.schematic-edge-line{fill:none;stroke-width:1.7;stroke-linejoin:round;stroke-dasharray:6 4}
+.schematic-edge-line{fill:none;stroke-width:1.7;stroke-linejoin:round;stroke-dasharray:6 4;animation:schematic-edge-flow 1s linear infinite}
+@keyframes schematic-edge-flow{from{stroke-dashoffset:var(--schematic-dash-offset,0px)}to{stroke-dashoffset:calc(var(--schematic-dash-offset,0px) - 10px)}}
+@media(prefers-reduced-motion:reduce){.schematic-edge-line{animation:none}}
 .schematic-edge.active .schematic-edge-line,.schematic-edge:hover .schematic-edge-line,.schematic-edge:focus-visible .schematic-edge-line{stroke-width:2.7}
 .schematic-edge-hit{fill:none;stroke:transparent;stroke-width:16}
 .schematic-node.muted,.schematic-edge.muted{opacity:.24}
