@@ -57,6 +57,22 @@ test('건물·층 포커싱은 화면 비율·회전·대상 크기에 맞춰 �
   }
 });
 
+test('관제 화면 맞춤은 대지·층을 화면의 92%까지 채우고 대상과 데이터를 보존한다',()=>{
+  for(const mode of ['3d','plan'])for(const aspect of [.55,1.5,2.8])for(const floor of [false,true]){
+    const {scene}=fixture(mode);scene.width=scene.height*aspect;scene.perspective.aspect=aspect;
+    scene.state.site={width:60,depth:40};scene.state.equipment=[{x:0,z:0,y:0,height:18}];
+    if(floor)scene.state.scopeFloorId='floor';
+    const before=JSON.stringify(scene.state);scene.fit();const editorRadius=scene.radius;
+    scene.readOnly=true;scene.fit();assert.ok(scene.radius<editorRadius);
+    let extent=0;
+    for(const x of [-30,30])for(const z of [-20,20])for(const y of [0,18]){
+      const p=new T.Vector3(x,y,z).project(scene.camera);extent=Math.max(extent,Math.abs(p.x),Math.abs(p.y));
+      assert.ok(Math.abs(p.x)<=.920001&&Math.abs(p.y)<=.920001&&p.z>=-1&&p.z<=1);
+    }
+    assert.ok(extent>.91999);assert.equal(JSON.stringify(scene.state),before);
+    scene.readOnly=false;scene.fit();assert.equal(scene.radius,editorRadius);
+  }
+});
 test('관제 설비 포커싱은 표시 위치를 중심으로 적당히 확대하고 시점·가까운 배율·데이터를 보존한다',()=>{
   for(const mode of ['3d','plan'])for(const aspect of [.55,1.5])for(const size of [2,40]){
     const {scene}=fixture(mode);scene.readOnly=true;scene.radius=1000;

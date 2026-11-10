@@ -2,7 +2,12 @@
   'use strict';
   const num=v=>Number(v).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
   const integer=v=>Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
-  const put=(el,value,raw=false)=>{if(!el)return;if(raw)el.setAttribute('data-i18n-skip','');if(el.textContent!==String(value))el.textContent=String(value);};
+  const put=(el,value,raw=false)=>{if(!el)return;if(raw)el.setAttribute('data-i18n-skip','');else el.removeAttribute('data-i18n-skip');if(el.textContent!==String(value))el.textContent=String(value);};
+  const amount=(el,value,currency=false,sign='')=>{
+    if(!currency){put(el,sign+value,true);return;}
+    const unit=document.createElement('span');unit.className='dashboard-unit dashboard-currency';unit.textContent='₩';
+    el.setAttribute('data-i18n-skip','');el.replaceChildren(document.createTextNode(sign),unit,document.createTextNode(value));
+  };
   const text=(panel,selector,value,raw=false)=>put(panel.querySelector(selector),value,raw);
   const all=(panel,selector)=>Array.from(panel.querySelectorAll(selector));
   const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -30,7 +35,7 @@
     all(overview,'.dashboard-legend span').forEach((el,i)=>{el.lastChild.nodeValue=(i?'전일':'금일')+' 사용량 (kWh)';});
     all(overview,'.dashboard-comparisons>div').forEach((row,i)=>{
       put(row.querySelector('span'),i%2?'작년 동일 대비':'전주 평균 대비');
-      const b=row.querySelector('b');b.firstChild.nodeValue='— ';put(b.querySelector('em'),'—',true);b.classList.remove('mock-increase');
+      const b=row.querySelector('b');put(b.querySelector('.comparison-value'),'—',true);put(b.querySelector('em'),'—',true);b.classList.remove('mock-increase');
     });
     all(overview,'.emissions-card dt span').forEach(el=>put(el,'',true));
     all(overview,'.emissions-card .dashboard-unit').forEach(el=>put(el,'tCO₂e',true));
@@ -65,7 +70,7 @@
     text(hourly,'.dashboard-chip b',num(o.total),true);
     all(hourly,'.chart-today rect').forEach((bar,i)=>{
       const value=o.today[i];bar.setAttribute('y',y(value||0));bar.setAttribute('height',value==null?0:128-y(value));
-      put(bar.querySelector('title'),`${s.date} ${String(i*2).padStart(2,'0')}:00 · ${value==null?'미래 시간':num(value)+' kWh'}`,true);
+      put(bar.querySelector('title'),`${s.date} ${String(i*2).padStart(2,'0')}:00 · ${value==null?'미래 시간':num(value)+' kWh'}`);
     });
     all(hourly,'.chart-grid line').forEach((line,i)=>{line.setAttribute('y1',y(i*scale/2));line.setAttribute('y2',y(i*scale/2));});
     all(hourly,'.chart-grid text').forEach((label,i)=>{label.setAttribute('y',y(i*scale/2)+3);put(label,num(i*scale/2),true);});
@@ -74,20 +79,20 @@
     hourly.title=`금일 ${s.date} / 전일 ${o.yesterdayDate} · ${s.elapsed} 동일 시간 비교`;
     all(hourly,'.dashboard-legend span').forEach((label,i)=>{label.lastChild.nodeValue=`${i?'전일':'금일'} ${md(i?o.yesterdayDate:s.date)} (kWh)`;});
     all(overview,'.comparison-card').forEach((card,index)=>{
-      const factor=index?o.tariff/1000:1,unit=index?'천원':'kWh',value=o.total*factor;
-      if(index)card.title='목업 단가 '+num(o.tariff)+'원/kWh · '+s.date+' '+s.elapsed;
-      text(card,'.dashboard-total strong',num(value),true);
+      const factor=index?o.tariff:1,unit=index?'':'kWh',value=o.total*factor;
+      if(index)card.title='목업 단가 ₩'+num(o.tariff)+'/kWh · '+s.date+' '+s.elapsed;
+      amount(card.querySelector('.dashboard-total strong'),num(value),!!index);
       all(card,'.dashboard-comparisons>div').forEach((row,i)=>{
         const reference=(i?o.year:o.week)*factor,delta=value-reference,percent=reference?delta/reference*100:0;
         put(row.querySelector('span'),`${i?'작년 동일 대비':'전주 평균 대비'} (${s.elapsed})`);
         row.title=(i?o.yearDate:o.weekRange)+' · '+s.elapsed;
-        const b=row.querySelector('b');b.firstChild.nodeValue=(delta<0?'−':'+')+num(Math.abs(delta))+' ';
+        const b=row.querySelector('b');amount(b.querySelector('.comparison-value'),num(Math.abs(delta)),!!index,delta<0?'−':'+');
         put(b.querySelector('small'),unit);put(b.querySelector('em'),`${percent<0?'−':'+'}${num(Math.abs(percent))}% ${delta<0?'↓':'↑'}`,true);
         b.classList.toggle('mock-increase',delta>0);
       });
       all(card,'.dashboard-bar-row').forEach((row,i)=>{
-        const amount=[o.total,o.week,o.max][i]*factor;
-        row.querySelector('i').style.width=(o.max?amount/(o.max*factor)*100:0)+'%';put(row.querySelector('b'),integer(amount),true);
+        const value=[o.total,o.week,o.max][i]*factor;
+        row.querySelector('i').style.width=(o.max?value/(o.max*factor)*100:0)+'%';amount(row.querySelector('b'),integer(value),!!index);
       });
     });
     all(overview,'.emissions-card dl>div').forEach((row,i)=>{
@@ -121,7 +126,7 @@
     text(ess,'.ess-tariff-table b',integer(o.contract),true);
     text(ess,'.ess-tariff-table tr:first-child td','산업용(을) 고압 A 선택 III');
     all(ess,'.ess-savings-table').forEach((table,i)=>{
-      all(table,'td b').forEach((el,j)=>put(el,integer((i?e.solarSavings:e.savings)[j]),true));
+      all(table,'td b').forEach((el,j)=>amount(el,integer((i?e.solarSavings:e.savings)[j]),true));
       const monday=new Date(s.date+'T00:00:00Z');monday.setUTCDate(monday.getUTCDate()-(monday.getUTCDay()+6)%7);
       all(table,'tr').forEach((row,j)=>{row.title=(j===0?s.date:j===1?monday.toISOString().slice(0,10):s.date.slice(0,7)+'-01')+' ~ '+s.date+' '+s.time;});
     });

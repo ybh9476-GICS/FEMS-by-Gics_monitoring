@@ -466,7 +466,7 @@
     },
     afterChange(next){
       scene?.setReadOnly(next==='monitoring');schematic?.setReadOnly(next==='monitoring');
-      if(next==='monitoring'){selected=null;selectedIds=[];projectSelected=false;groupFrame=null;spaces.selected=null;render();}
+      if(next==='monitoring'){selected=null;selectedIds=[];projectSelected=false;groupFrame=null;spaces.selected=null;render();if(view!=='schematic'){scene?.resize();scene?.fit({preserveAngle:true});}}
       else if(editorModeState){
         const previous=editorModeState;editorModeState=null;
         setView(previous.view);selected=previous.selected;selectedIds=previous.selectedIds;projectSelected=previous.projectSelected;groupFrame=previous.groupFrame;

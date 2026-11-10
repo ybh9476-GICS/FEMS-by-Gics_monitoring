@@ -99,7 +99,7 @@
         box.box.setFromObject(object);box.box.expandByScalar(.09);
       }
     }
-    setMode(mode){this.cancelFocus();if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.lastPointer=null;this.mode=mode;if(mode==='plan')this.planYaw=0;this.camera=mode==='plan'?this.ortho:this.perspective;this.models.forEach(m=>m.visible=mode==='3d');this.footprints.forEach(m=>m.visible=mode==='plan');this.resize();this.updateSelection();}
+    setMode(mode){this.cancelFocus();if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.lastPointer=null;this.mode=mode;if(mode==='plan')this.planYaw=0;this.camera=mode==='plan'?this.ortho:this.perspective;this.models.forEach(m=>m.visible=mode==='3d');this.footprints.forEach(m=>m.visible=mode==='plan');this.resize();this.updateSelection();if(this.readOnly)this.fit({preserveAngle:true});}
     setReadOnly(value){this.cancelFocus();if(this.drag)this.cancelDrag();if(value)this.setArmed(null);this.readOnly=!!value;this.connectionSelection=null;this.connectionGuides={};this.cornerMode=false;this.setHover();this.updateGizmo();this.invalidate();}
     setArmed(type){if(this.drag?.axis||this.drag?.connection)this.cancelDrag();this.setHover();this.armed=type;this.ghost.visible=false;this.updateCursor();this.invalidate();}
     transformItem(){
@@ -184,9 +184,9 @@
       const halfFov=Math.atan(Math.tan(19*Math.PI/180)*Math.min(1,aspect));
       const c=Math.abs(Math.cos(this.planYaw)),s=Math.abs(Math.sin(this.planYaw));
       let radius=this.mode==='plan'?Math.max((c*depth+s*width)*1.25,(c*width+s*depth)/aspect*1.25):Math.hypot(width,depth,high-low)/2/Math.sin(halfFov)*1.1;
-      if(spatial){
-        // Fit the actual box in the current view, leaving 8% padding on each screen edge.
-        const fill=.84;
+      if(spatial||this.readOnly){
+        // Fit the projected bounds: monitoring leaves 4% padding, editing keeps 8%.
+        const fill=this.readOnly?.92:.84;
         if(this.mode==='plan')radius=Math.max(c*depth+s*width,(c*width+s*depth)/aspect)/fill;
         else{
           const cy=Math.cos(this.yaw),sy=Math.sin(this.yaw),cp=Math.cos(this.pitch),sp=Math.sin(this.pitch);

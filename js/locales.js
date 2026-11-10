@@ -137,6 +137,25 @@ UPS 대시보드 예시 · 좌우 스크롤¦Sample UPS dashboard · Scroll hori
 시간대별 전력 소비량¦Hourly consumption¦時間帯別電力消費量
 금일 총 사용량¦Today's total¦本日の総使用量
 금일 사용량 (kWh)¦Today (kWh)¦本日 (kWh)
+일¦Day¦日
+월¦Month¦月
+정상¦Normal¦正常
+금일 {0} (kWh)¦Today {0} (kWh)¦本日 {0} (kWh)
+전일 {0} (kWh)¦Yesterday {0} (kWh)¦前日 {0} (kWh)
+전주 평균 대비¦vs. last week¦前週平均比
+작년 동일 대비¦vs. last year¦前年同日比
+전주 평균 대비 ({0})¦vs. last week ({0})¦前週平均比 ({0})
+작년 동일 대비 ({0})¦vs. last year ({0})¦前年同日比 ({0})
+금일 {0} / 전일 {1} · {2} 동일 시간 비교¦Today {0} / Yesterday {1} · Same-period comparison {2}¦本日 {0} / 前日 {1}・同一時間帯比較 {2}
+목업 단가 ₩{0}/kWh · {1}¦Mock rate ₩{0}/kWh · {1}¦モック単価 ₩{0}/kWh・{1}
+{0} · 미래 시간¦{0} · Future time¦{0}・未来の時間
+피크 전력 목업 {0} kW¦Mock peak power {0} kW¦ピーク電力モック {0} kW
+피크 전력 데이터 없음¦No peak power data¦ピーク電力データなし
+시간대별 전력 소비량 데이터 없음¦No hourly consumption data¦時間帯別電力消費量データなし
+{0} kWh · 목업¦{0} kWh · Mock¦{0} kWh・モック
+태양광 {0} kW 인버터별 발전 현황 · 목업¦Solar {0} kW generation by inverter · Mock¦太陽光{0} kWインバーター別発電状況・モック
+목업 환산 계수 0.45 kgCO₂e/kWh 적용¦Mock conversion factor 0.45 kgCO₂e/kWh applied¦モック換算係数0.45 kgCO₂e/kWhを適用
+배터리 충전 상태 데이터 없음¦No battery charge data¦バッテリー充電状態データなし
 전일 사용량 (kWh)¦Yesterday (kWh)¦前日 (kWh)
 당일 전기 사용량¦Daily electricity use¦当日電力使用量
 당일 전기 요금¦Daily electricity cost¦当日電気料金

@@ -9,7 +9,8 @@
   strip.dataset.dashboardPanel='overview';
   strip.setAttribute('role','region');strip.setAttribute('aria-label','통합 대시보드 예시 · 좌우 스크롤');
   const number=value=>value.toLocaleString('en-US');
-  const metric=(value,unit)=>`<strong>${value}</strong><span class="dashboard-unit">${unit}</span>`;
+  const currency=value=>`<span class="dashboard-unit dashboard-currency">₩</span>${value}`;
+  const metric=(value,unit)=>unit==='₩'?`<strong>${currency(value)}</strong>`:`<strong>${value}</strong><span class="dashboard-unit">${unit}</span>`;
   const point=(angle,radius)=>{const a=angle*Math.PI/180;return [110+radius*Math.cos(a),105-radius*Math.sin(a)];};
   const ticks=Array.from({length:19},(_,i)=>{
     const [x1,y1]=point(180-i*10,77),[x2,y2]=point(180-i*10,91);
@@ -24,7 +25,7 @@
   const grid=[0,1000,2000].map(value=>`<line x1="32" y1="${chartY(value)}" x2="370" y2="${chartY(value)}"/><text x="27" y="${chartY(value)+3}" text-anchor="end">${number(value)}</text>`).join('');
   function comparison(title,value,unit,rows,bars){
     const max=Math.max(...bars.map(row=>row[1]));
-    return `<article class="dashboard-card comparison-card"><h3>${title}</h3><div class="dashboard-total">${metric(number(value),unit)}</div><div class="dashboard-comparisons">${rows.map(row=>`<div><span>${row[0]}</span><b>${row[1]} <small>${unit}</small><em>${row[2]}% ↓</em></b></div>`).join('')}</div><div class="dashboard-bars">${bars.map((row,i)=>`<div class="dashboard-bar-row"><span>${row[0]}</span><div class="dashboard-bar-track"><i class="bar-${i}" style="width:${row[1]/max*100}%"></i></div><b>${number(row[1])}</b></div>`).join('')}</div></article>`;
+    return `<article class="dashboard-card comparison-card${unit==='₩'?' cost-card':''}"><h3>${title}</h3><div class="dashboard-total">${metric(number(value),unit)}</div><div class="dashboard-comparisons">${rows.map(row=>`<div><span>${row[0]}</span><b><span class="comparison-value">${unit==='₩'?String(row[1]).replace(/^([−+-]?)(.*)$/,(match,sign,value)=>sign+currency(value)):row[1]}</span> <small>${unit==='₩'?'':unit}</small><em>${row[2]}% ↓</em></b></div>`).join('')}</div><div class="dashboard-bars">${bars.map((row,i)=>`<div class="dashboard-bar-row"><span>${row[0]}</span><div class="dashboard-bar-track"><i class="bar-${i}" style="width:${row[1]/max*100}%"></i></div><b>${unit==='₩'?currency(number(row[1])):number(row[1])}</b></div>`).join('')}</div></article>`;
   }
   strip.innerHTML=`
     <article class="dashboard-card power-card"><h3>실시간 전력</h3><div class="dashboard-gauge"><svg viewBox="0 5 220 113" aria-hidden="true"><path class="gauge-track" d="M20 105 A90 90 0 0 1 200 105"/><path class="gauge-fill" d="M20 105 A90 90 0 0 1 200 105" pathLength="100" stroke-dasharray="53 100"/></svg><div class="gauge-value">${metric('372','kW')}</div></div><div class="dashboard-card-footer"><span>부하율</span><b>53<span class="dashboard-unit">%</span></b></div></article>
@@ -33,9 +34,9 @@
     ${comparison('당일 전기 사용량',19419,'kWh',[
       ['전주 평균 대비 (00–16시)','−6,069','−23.8'],['작년 동일 대비 (00–16시)','−4,992','−20.4']
     ],[['당일',19419],['평균',25488],['최대',27138]])}
-    ${comparison('당일 전기 요금',2496,'천원',[
-      ['전주 평균 대비 (00–16시)','−904','−26.6'],['작년 동일 대비 (00–16시)','−384','−13.3']
-    ],[['당일',2496],['평균',3399],['최대',3695]])}
+    ${comparison('당일 전기 요금',2496000,'₩',[
+      ['전주 평균 대비 (00–16시)','−904,000','−26.6'],['작년 동일 대비 (00–16시)','−384,000','−13.3']
+    ],[['당일',2496000],['평균',3399000],['최대',3695000]])}
     <article class="dashboard-card emissions-card"><h3>온실가스 누적배출량</h3><dl><div><dt>금년 <span>(1/1~10/1)</span></dt><dd>${metric('1,959.33','TOE')}</dd></div><div><dt>당월 <span>(10/1~10/1)</span></dt><dd>${metric('4.47','TOE')}</dd></div><div><dt>전월 <span>(9/1~9/1)</span></dt><dd>${metric('6.88','TOE')}</dd></div></dl></article>`;
   host.append(strip);
   const solar=document.createElement('div');
@@ -61,7 +62,7 @@
   const ess=document.createElement('div');
   ess.className='dashboard-strip';ess.tabIndex=0;ess.hidden=true;ess.dataset.dashboardPanel='ess';
   ess.setAttribute('role','region');ess.setAttribute('aria-label','ESS 대시보드 예시 · 좌우 스크롤');
-  const savingTable=(title,values)=>`<table class="ess-table ess-savings-table"><caption>${title}</caption><tbody>${['일일','주간','월간'].map((label,i)=>`<tr><th scope="row">${label}</th><td>${upsValue(values[i],'원')}</td></tr>`).join('')}</tbody></table>`;
+  const savingTable=(title,values)=>`<table class="ess-table ess-savings-table"><caption>${title}</caption><tbody>${['일일','주간','월간'].map((label,i)=>`<tr><th scope="row">${label}</th><td><b data-i18n-skip>${currency(values[i])}</b></td></tr>`).join('')}</tbody></table>`;
   ess.innerHTML=`
     <article class="dashboard-card ess-energy-card"><section><h3>충전량 (일/월)</h3><dl><div class="ess-energy-today charging"><dt>일</dt><dd>${metric('3,008,284','kWh')}</dd></div><div><dt>월</dt><dd>${metric('53,008,284','kWh')}</dd></div></dl></section><section><h3>방전량 (일/월)</h3><dl><div class="ess-energy-today discharging"><dt>일</dt><dd>${metric('665,243','kWh')}</dd></div><div><dt>월</dt><dd>${metric('47,871,243','kWh')}</dd></div></dl></section></article>
     <article class="dashboard-card ess-pcs-card"><header><h3>PCS 1</h3><span class="dashboard-chip">전력변환장치</span></header><div class="ess-pcs-body"><div class="ess-pcs-summary"><div class="ess-pcs-gauge"><svg viewBox="0 5 220 110" aria-hidden="true"><path class="gauge-track" d="M20 105 A90 90 0 0 1 200 105"/><path class="ess-discharge-arc" d="M20 105 A90 90 0 0 1 200 105" pathLength="100" stroke-dasharray="85.3 100"/></svg><div>${metric('−853.0','kW')}</div></div><div class="ess-pcs-status"><span>운전 중</span><span class="ess-discharging">방전</span><span>${upsValue('46.0','°C')}</span></div></div><table class="ess-table ess-grid-table" aria-label="PCS 1 계통정보"><thead><tr><th scope="col">계통정보</th><th scope="col">R</th><th scope="col">S</th><th scope="col">T</th></tr></thead><tbody><tr><th scope="row">전압 [V]</th><td>455.5</td><td>459.5</td><td>451.0</td></tr><tr><th scope="row">전류 [A]</th><td>1,082.3</td><td>1,078.9</td><td>1,092.5</td></tr><tr><th scope="row">주파수 [Hz] / 역률</th><td colspan="3">60.0 / 0.999</td></tr></tbody></table></div></article>

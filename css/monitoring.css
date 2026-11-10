@@ -81,6 +81,8 @@ body[data-workspace-mode=monitoring] #monitor-dashboard{display:flex;flex-direct
 .dashboard-card h3{font-size:12px;font-weight:650;line-height:18px;letter-spacing:-.15px;margin:0;color:#46655c}
 .dashboard-card header{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .dashboard-unit{font-size:12px;font-weight:450;color:#81958d;margin-left:4px}
+.dashboard-unit.dashboard-currency{font-size:.75em;margin:0 2px 0 0}
+.dashboard-total .dashboard-currency{font-size:12px}
 .dashboard-gauge{position:relative;flex:1;min-height:100px;display:grid;place-items:center}
 .dashboard-gauge svg,.peak-gauge{width:100%;height:121px;max-height:100%;flex:1;min-height:95px}
 .gauge-track,.gauge-fill{fill:none;stroke-width:18}
@@ -102,6 +104,8 @@ body[data-workspace-mode=monitoring] #monitor-dashboard{display:flex;flex-direct
 .dashboard-legend{display:flex;align-items:center;justify-content:center;gap:17px;font-size:9px;color:#83968e;white-space:nowrap}
 .dashboard-legend span{display:flex;align-items:center;gap:5px}.dashboard-legend i{display:inline-block;width:8px;height:8px;border-radius:1px}.legend-today{background:#43a89a}.legend-yesterday{background:#a6bb64}
 .comparison-card{flex-basis:320px}
+.comparison-card.cost-card{flex-basis:380px}
+.cost-card .dashboard-bar-row>b{width:76px;flex-shrink:0;white-space:nowrap}
 .dashboard-total{display:flex;justify-content:center;align-items:baseline;gap:2px;padding:6px 0 8px}
 .dashboard-total strong{font-size:28px;line-height:32px;letter-spacing:-.8px;font-weight:650}
 .dashboard-comparisons{display:grid;gap:6px;font-size:10px;color:#89988f;white-space:nowrap}

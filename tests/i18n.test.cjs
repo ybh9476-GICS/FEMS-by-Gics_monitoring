@@ -1,5 +1,14 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const entries=require('../js/locales.js'),I=require('../js/i18n.js');
+test('관제의 날짜·시간 범위와 상태 문구를 번역하고 원화 기호와 수치를 보존한다',()=>{
+  const phrases=['일','월','정상','금일 11/10 (kWh)','전일 11/09 (kWh)','전주 평균 대비','작년 동일 대비','전주 평균 대비 (00:00–16:32)','작년 동일 대비 (00:00–16:32)','금일 2026-11-10 / 전일 2026-11-09 · 00:00–16:32 동일 시간 비교','목업 단가 ₩160.0/kWh · 2026-11-10 00:00–16:32'];
+  for(const locale of ['en','ja'])for(const phrase of phrases){
+    const translated=I.translate(phrase,locale);assert.ok(!/[가-힣]/.test(translated),translated);
+    assert.deepEqual(translated.match(/\d[\d:/.–-]*/g),phrase.match(/\d[\d:/.–-]*/g));
+    assert.equal(translated.includes('₩'),phrase.includes('₩'));
+  }
+  for(const locale of ['ko','en','ja'])assert.equal(I.translate('₩1,608,123.4',locale),'₩1,608,123.4');
+});
 
 test('파일 선택·배치 알림·분기점·공간 검사 오류를 두 외국어로 번역한다',()=>{
   const phrases=['파일 선택','선택된 파일 없음','모델 파일 선택','파일을 선택하세요.','값을 입력하거나 선택하세요.','올바른 숫자를 입력하세요.','10 이하의 값을 입력하세요.','1 이상의 값을 입력하세요.','분기점 · 3개 설비','Pump을(를) 배치했습니다.'];
