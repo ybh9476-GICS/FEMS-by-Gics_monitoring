@@ -59,7 +59,7 @@ body[data-workspace-mode=monitoring] .workspace{grid-template-columns:minmax(0,1
 /* Details sit beside the toolbar and viewport; the dashboard keeps the full width. */
 body[data-workspace-mode=monitoring] .editor{grid-column:1;grid-row:1;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) 0px;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;transition:grid-template-columns .22s ease}
 body[data-workspace-mode=monitoring].monitor-details-open .editor{grid-template-columns:minmax(0,1fr) min(var(--right-width,var(--right-default)),40vw)}
-body[data-workspace-mode=monitoring] .editor-toolbar{grid-column:1;grid-row:1;min-width:0}
+body[data-workspace-mode=monitoring] .editor-toolbar{grid-column:1 / -1;grid-row:1;min-width:0}
 body[data-workspace-mode=monitoring] .viewport{grid-column:1;grid-row:2;min-width:0}
 body[data-workspace-mode=monitoring] :is(.catalog-panel,.inspector,.panel-resizer,.equipment-dock,.statusbar,.alignment-tools,#undo,#redo,.history-tools .divider,#empty-state,#catalog-tooltip),
 body[data-workspace-mode=monitoring] .file-actions > button:not(#settings-open){display:none!important}
@@ -116,7 +116,7 @@ body[data-workspace-mode=monitoring] #monitor-dashboard{display:flex;flex-direct
 .dashboard-bar-row>span{width:22px;flex-shrink:0}.dashboard-bar-row>b{font-size:9px;font-weight:450;width:40px;text-align:right}
 .dashboard-bar-track{flex:1;height:10px;background:#f3f6f4;border-radius:2px;overflow:hidden}.dashboard-bar-track i{display:block;height:100%;border-radius:2px}.bar-0{background:#3ba78b}.bar-1{background:#dfb766}.bar-2{background:#d8898c}
 .emissions-card{flex-basis:310px}.emissions-card dl{margin:5px 0 0;display:flex;flex-direction:column;flex:1}.emissions-card dl>div{display:flex;justify-content:space-between;align-items:center;gap:16px;flex:1;border-bottom:1px solid #edf1ee}.emissions-card dl>div:last-child{border-bottom:0}.emissions-card dt{font-size:11px;color:#7d9387;white-space:nowrap}.emissions-card dt span{font-size:10px}.emissions-card dd{margin:0;white-space:nowrap}.emissions-card dd strong{font-size:21px;font-weight:600;letter-spacing:-.4px}.emissions-card .dashboard-unit{font-size:10px}
-body[data-workspace-mode=monitoring] #monitor-details{display:block;grid-column:2;grid-row:1 / 3;min-height:0;width:min(var(--right-width,var(--right-default)),40vw);background:#fff;border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .22s ease,visibility .22s;z-index:20}
+body[data-workspace-mode=monitoring] #monitor-details{display:block;grid-column:2;grid-row:2;min-height:0;width:min(var(--right-width,var(--right-default)),40vw);background:#fff;border-left:1px solid var(--line);transform:translateX(100%);visibility:hidden;transition:transform .22s ease,visibility .22s;z-index:20}
 body[data-workspace-mode=monitoring].monitor-details-open #monitor-details{transform:translateX(0);visibility:visible}
 #monitor-details{overflow-y:auto;color:#24463f}
 #monitor-details .panel-heading{padding:14px 18px 10px}
