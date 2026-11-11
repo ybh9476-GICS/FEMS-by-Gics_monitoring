@@ -476,6 +476,49 @@
     }
   });
   renderCatalog();render();scene?.fit();
+  function cameraSnapshot(){
+    return scene?{target:{x:scene.target.x,y:scene.target.y,z:scene.target.z},radius:scene.radius,yaw:scene.yaw,pitch:scene.pitch,planYaw:scene.planYaw}:null;
+  }
+  function viewSnapshot(){
+    return {view,sceneMode:scene?.mode,context:{...spaces.context},selectedIds:[...selectedIds],spaceSelected:spaces.selected,projectSelected,
+      camera:cameraSnapshot(),showLabels:scene?.showLabels,
+      diagram:{scale:schematic.scale,offset:{...schematic.offset},fitted:schematic.fitted,search:schematic.search.value,neighbors:schematic.neighbors.checked}};
+  }
+  function restoreView(saved){
+    // Apply navigation and selection first: they can resize/refit the camera.
+    spaces.context=saved.context;spaces.selected=saved.spaceSelected;selectedIds=saved.selectedIds;
+    selected=selectedIds.length===1?selectedIds[0]:null;projectSelected=saved.projectSelected;groupFrame=null;
+    if(saved.diagram){schematic.search.value=saved.diagram.search;schematic.neighbors.checked=saved.diagram.neighbors;}
+    if(saved.view==='schematic'&&scene?.mode!==saved.sceneMode)scene?.setMode(saved.sceneMode);
+    setView(saved.view);render();
+    if(scene){
+      scene.cancelFocus();scene.showLabels=saved.showLabels;$('labels-toggle').setAttribute('aria-pressed',String(scene.showLabels));
+      if(saved.camera){scene.target.copy(saved.camera.target);for(const key of ['radius','yaw','pitch','planYaw'])scene[key]=saved.camera[key];}
+      scene.resize();
+    }
+    if(saved.diagram?.fitted){schematic.scale=saved.diagram.scale;schematic.offset=saved.diagram.offset;schematic.fitted=true;schematic.transform();}
+  }
+  try{
+    const saved=window.FEMSViewSession.read(sessionStorage,history.current);
+    if(saved){
+      if(saved.mode==='monitoring'){
+        if(saved.editor)restoreView(saved.editor);
+        window.FEMSWorkspaceMode.setMode('monitoring');
+      }
+      restoreView(saved);window.FEMSWorkspaceMode.chooseDashboard(saved.dashboard);
+      const panel=document.querySelector('[data-dashboard-panel="'+window.FEMSWorkspaceMode.dashboard+'"]');
+      if(panel)panel.scrollLeft=saved.dashboardScroll;
+    }
+  }catch{/* A blocked browser store must not prevent opening the drawing. */}
+  function saveViewSession(){
+    const dashboard=window.FEMSWorkspaceMode.dashboard;
+    try{window.FEMSViewSession.save(sessionStorage,history.current,{...viewSnapshot(),mode:window.FEMSWorkspaceMode.mode,dashboard,
+      dashboardScroll:document.querySelector('[data-dashboard-panel="'+dashboard+'"]')?.scrollLeft||0,
+      editor:editorModeState?{...editorModeState,showLabels:scene?.showLabels}:null});}catch{}
+  }
+  window.addEventListener('beforeunload',saveViewSession);
+  window.addEventListener('pagehide',saveViewSession);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveViewSession();});
   if(assetStartupMessage)library.showStatus(assetStartupMessage);
   if(startupMessage){$('save-status').textContent='복원 실패 · 자동 저장 중지';toast(startupMessage);}else{$('save-status').textContent='로컬 작업 공간 · 자동 저장';if(branchMigrationMessage)toast(branchMigrationMessage);}
   $('project-backup-save').addEventListener('click',async()=>{

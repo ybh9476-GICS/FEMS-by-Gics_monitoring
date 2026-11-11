@@ -13,12 +13,12 @@ body[data-workspace-mode="monitoring"] .scene-controls { display: none; }
 #monitor-companion button#companion-summon svg { width: 16px; height: 16px; }
 #companion-character { position: fixed; z-index: 1001; right: 28px; bottom: 82px; width: 57.75px; aspect-ratio: 781 / 954.14; user-select: none; touch-action: none; }
 #companion-figure { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; touch-action: none; filter: drop-shadow(0 0 8px #d0f0ff7a) drop-shadow(0 0 24px #d0f0ff38); animation: companion-drift-x 7.6s ease-in-out -3.8s infinite alternate, companion-bob-y 5.3s ease-in-out -1.325s infinite alternate; }
-#companion-character[data-dragging="true"] #companion-figure { cursor: grabbing; animation-play-state: paused; }
+#companion-character[data-dragging="true"] #companion-figure { cursor:var(--cursor-grabbing, grabbing); animation-play-state: paused; }
 #companion-figure > svg, #companion-figure > img { display: block; width: 100%; height: 100%; overflow: visible; }
 #companion-figure > svg { animation: companion-glow-pulse 1s ease-in-out infinite; }
 #companion-figure svg path[fill="#FFFFFF"] { filter: drop-shadow(0 0 3px #d0f0ff85) drop-shadow(0 0 8px #d0f0ff3d); }
 #companion-figure .companion-eye { transform-box: fill-box; transform-origin: center; }
-@keyframes companion-glow-pulse { 0%,100% { filter: brightness(.86); } 50% { filter: brightness(1.12) drop-shadow(0 0 24px #d0f0ff47); } }
+@keyframes companion-glow-pulse { 0%,100% { filter: drop-shadow(0 0 24px #d0f0ff00); } 50% { filter: drop-shadow(0 0 24px #d0f0ff47); } }
 @keyframes companion-drift-x { from { translate: -16px 0; } to { translate: 16px 0; } }
 @keyframes companion-bob-y { from { transform: translateY(-14px); } to { transform: translateY(14px); } }
 #companion-chat { position: fixed; z-index: 1000; display: flex; flex-direction: column; width: 370px; max-width: calc(100vw - 32px); height: 575px; max-height: calc(100dvh - 32px); border: 1px solid var(--chat-line); border-radius: 16px; background: var(--chat-panel); box-shadow: 0 12px 32px #0003; font-size: 13px; line-height: 1.55; }
@@ -27,7 +27,7 @@ body[data-workspace-mode="monitoring"] .scene-controls { display: none; }
 #companion-chat[data-placement="right"]::after { left: -8px; top: var(--tail-top); border-bottom: 1px solid var(--chat-line); border-left: 1px solid var(--chat-line); }
 #companion-chat[data-placement="above"]::after { bottom: -8px; left: var(--tail-left); border-bottom: 1px solid var(--chat-line); border-right: 1px solid var(--chat-line); }
 #companion-chat[data-placement="below"]::after { top: -8px; left: var(--tail-left); border-top: 1px solid var(--chat-line); border-left: 1px solid var(--chat-line); }
-.companion-chat-header { cursor: grab; touch-action: none; user-select: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--chat-line); flex-shrink: 0; }
+.companion-chat-header { cursor:var(--cursor-grab, grab); touch-action: none; user-select: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--chat-line); flex-shrink: 0; }
 .companion-chat-header h2 { margin: 0; font-size: 16px; font-weight: 700; color: var(--chat-text); }
 #companion-close { display: grid; place-items: center; width: 30px; height: 30px; padding: 4px; border: 0; border-radius: 7px; background: transparent; }
 #companion-close:hover { background: var(--chat-input); }
@@ -51,5 +51,5 @@ body[data-workspace-mode="monitoring"] .scene-controls { display: none; }
 #companion-input-hint { display: block; color: var(--chat-muted); font-size: 10px; margin-top: 5px; }
 @media (prefers-reduced-motion: reduce) { #companion-figure, #companion-figure > svg { animation: none; } }
 
-#companion-chat[data-dragging="true"] .companion-chat-header { cursor: grabbing; }
+#companion-chat[data-dragging="true"] .companion-chat-header { cursor:var(--cursor-grabbing, grabbing); }
 #companion-chat[data-placement="detached"]::after { display: none; }

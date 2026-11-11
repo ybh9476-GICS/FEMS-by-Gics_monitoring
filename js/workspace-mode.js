@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  // Session UI state only. Project data and the default Editor Mode are unchanged.
+  // Presentation state is separate from the project drawing.
   let mode='editor',adapter=null;
   const editorOnly='.catalog-panel,.inspector,.panel-resizer,.equipment-dock,.statusbar,.alignment-tools,#undo,#redo,.history-tools .divider,.file-actions > button:not(#settings-open)';
   const priorInert=new Map();
@@ -67,7 +67,7 @@
     document.body.classList.toggle('monitor-details-open',open);
     details.inert=!open;details.setAttribute('aria-hidden',String(!open));
   }
-  const api={get mode(){return mode;},configure(value){adapter=value;},selection,renderDashboard,
+  const api={get mode(){return mode;},get dashboard(){return dashboard;},chooseDashboard,configure(value){adapter=value;},selection,renderDashboard,
     locateEquipment(id){return mode==='monitoring'&&adapter?.locateEquipment?.(id)===true;},
     setMode(next){
       if(!adapter||!['editor','monitoring'].includes(next)||next===mode)return false;

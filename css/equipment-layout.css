@@ -50,7 +50,7 @@
 #equipment-tree ul { margin-left: 10px; padding-left: 4px; border-left: 1px solid #dce6e0; }
 #equipment-tree > li { margin-bottom: 1px; }
 #equipment-tree li { outline-offset: -2px; border-radius: 6px; }
-.tree-row { display: flex; align-items: center; gap: 4px; min-height: 26px; padding: 1px 8px 1px 3px; border: 1px solid transparent; border-radius: 6px; cursor: grab; user-select: none; touch-action: none; }
+.tree-row { display: flex; align-items: center; gap: 4px; min-height: 26px; padding: 1px 8px 1px 3px; border: 1px solid transparent; border-radius: 6px; cursor:var(--cursor-grab, grab); user-select: none; touch-action: none; }
 .tree-row:hover { background: #f3f7f5; }
 [role=treeitem][aria-selected=true] > .tree-row { background: #eaf5ef; border-color: #b4d1c1; }
 .tree-toggle { border: 0; background: transparent; padding: 3px; width: 19px; flex: 0 0 19px; color: #82958b; }

@@ -388,10 +388,10 @@ for (const mode of ['plan', '3d']) {
     listeners.pointermove({ clientX: 260, clientY: 230 });
     if(mode === 'plan')assert.ok(before.equals(scene.camera.quaternion));else assert.ok(before.angleTo(scene.camera.quaternion) > .1);
     assert.equal(scene.target.length(), 0);
-    if(mode === '3d')assert.equal(scene.host.style.cursor, 'grabbing');
+    if(mode === '3d')assert.equal(scene.host.style.cursor, 'var(--cursor-grabbing, grabbing)');
     if (mode === 'plan') assert.ok(scene.camera.getWorldDirection(new T.Vector3()).distanceTo(new T.Vector3(0, -1, 0)) < 1e-6);
     listeners.pointerup({ button: 2, pointerId: 1, clientX: 260, clientY: 230 });
-    assert.equal(scene.host.style.cursor, 'grab');
+    assert.equal(scene.host.style.cursor, 'var(--cursor-grab, grab)');
   });
   test(`${mode}: 선택·객체 이동은 화살표이고 객체 위 우클릭은 3D에서만 회전한다`, () => {
     const { scene, listeners } = fixture(mode);
