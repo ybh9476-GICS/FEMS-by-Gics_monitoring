@@ -2,6 +2,31 @@
   'use strict';
   // Korean source copy is the stable key. {0}, {1} are opaque names/numbers, never translated.
   const data=`
+AI 캐릭터 호출¦Summon AI character¦AIキャラクターを呼び出す
+AI 캐릭터 숨기기¦Hide AI character¦AIキャラクターを隠す
+AI 챗봇 열기¦Open AI chat¦AIチャットを開く
+AI 챗봇 닫기¦Close AI chat¦AIチャットを閉じる
+클릭하여 대화 · 드래그하여 이동¦Click to chat · Drag to move¦クリックで会話・ドラッグで移動
+AI 슈퍼바이저¦AI Supervisor¦AIスーパーバイザー
+AI 챗봇¦AI Chatbot¦AIチャットボット
+시연용 답변¦Demo responses¦デモ用の回答
+대화창 닫기¦Close chat¦チャットを閉じる
+대화 내용¦Conversation¦会話内容
+추천 질문¦Suggested questions¦質問の候補
+메시지 입력¦Message input¦メッセージ入力
+메시지를 입력하세요¦Type a message¦メッセージを入力してください
+메시지 보내기¦Send message¦メッセージを送信
+Enter 전송 · Shift+Enter 줄바꿈¦Enter to send · Shift+Enter for a new line¦Enterで送信・Shift+Enterで改行
+답변 작성 중…¦Preparing a reply…¦回答を作成中…
+현재 전체 불량률 요약해줘¦Summarize the current defect rate¦現在の全体不良率を要約して
+B라인 가동 중단 위험 분석¦Analyze line B downtime risk¦Bラインの稼働停止リスクを分析
+에너지 절감을 위한 최적 가동 시간은?¦What operating hours save the most energy?¦省エネに最適な稼働時間は？
+최근 발생한 안전 경보 이력 조회¦Show recent safety alerts¦最近の安全警報の履歴を確認
+안녕하세요! AI 슈퍼바이저 어시스턴트입니다. 무엇을 도와드릴까요?¦Hello! I'm your AI Supervisor assistant. How can I help you?¦こんにちは！AIスーパーバイザーアシスタントです。何をお手伝いしましょうか？
+현재 전체 라인의 평균 불량률은 3.2%입니다. B라인의 도금 공정에서 미세한 변동이 감지되었으나, 허용 범위 내에 있습니다.¦The average defect rate across all lines is 3.2%. Minor variations were detected in line B's plating process, within the acceptable range.¦全ラインの平均不良率は3.2%です。Bラインのめっき工程で微細な変動が検出されましたが、許容範囲内です。
+오늘의 종합 설비 효율(OEE)은 87.5%로 목표치(85%)를 상회하고 있습니다. 특히 조립 라인의 성능 지표가 전일 대비 4% 향상되었습니다.¦Today's overall equipment effectiveness (OEE) is 87.5%, above the 85% target. Assembly line performance improved by 4% compared with yesterday.¦本日の総合設備効率（OEE）は87.5%で、目標値85%を上回っています。特に組立ラインの性能指標は前日比で4%向上しました。
+현재 모든 안전 센서가 정상 작동 중입니다. 구역 C에서 작업자 1명이 보호구 미착용으로 경고 조치되었으며, 현재는 시정 완료되었습니다.¦All safety sensors are operating normally. One worker in zone C received a warning for missing protective equipment; the issue has been resolved.¦現在、すべての安全センサーは正常に動作しています。区画Cで作業員1名に保護具未着用の警告がありましたが、現在は是正済みです。
+요청하신 내용을 분석 중입니다. Supervisor 에이전트가 관련 데이터를 취합하여 최적의 답변을 준비하고 있습니다.¦Your request is being analyzed. The Supervisor agent is gathering relevant data to prepare a response.¦ご依頼の内容を分析中です。Supervisorエージェントが関連データを集め、回答を準備しています。
 상태¦Status¦状態
 모든 종류¦All types¦すべての種類
 설비 종류순¦Equipment type¦設備種類順

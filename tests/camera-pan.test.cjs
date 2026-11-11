@@ -10,6 +10,23 @@ for (const file of ['vendor/three.js', 'js/scene.js']) {
   vm.runInContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), context);
 }
 const T = context.THREE, Scene = context.FEMSScene;
+
+test('관제 빈 화면 더블클릭은 설비·빌보드·연결선을 제외하고 화면 좌표만 전달한다',()=>{
+  context.CustomEvent=class{constructor(type,options){this.type=type;Object.assign(this,options);}};
+  for(const mode of ['3d','plan']){
+    const {scene,listeners}=fixture(mode),sent=[];
+    scene.host.dispatchEvent=event=>sent.push(event);scene.host.getBoundingClientRect=()=>({width:900,height:700});
+    let hit=null,edge=null;scene.pickTarget=()=>({id:hit});scene.connections={pick:()=>edge};
+    const event={button:0,clientX:130,clientY:240,preventDefault(){}};
+    listeners.dblclick(event);assert.equal(sent.length,0);
+    scene.readOnly=true;hit='equipment';listeners.dblclick(event);assert.equal(sent.length,0);
+    hit=null;edge={id:'line'};listeners.dblclick(event);assert.equal(sent.length,0);
+    edge=null;listeners.dblclick({...event,button:2});assert.equal(sent.length,0);
+    const before=JSON.stringify(scene.state);listeners.dblclick(event);
+    assert.equal(sent.length,1);assert.equal(sent[0].type,'fems-background-dblclick');assert.ok(sent[0].bubbles);
+    assert.equal(sent[0].detail.clientX,130);assert.equal(sent[0].detail.clientY,240);assert.equal(JSON.stringify(scene.state),before);
+  }
+});
 test('층 내부·층 선택·미리보기 바닥과 벽은 불투명하고 공유 GLB 재질은 보존한다',()=>{
   const {scene}=fixture('3d');scene.state.floors=[{id:'custom-floor'}];
   for(const item of [{type:'space-floor',backdrop:true},{type:'space-floor',floorSelector:true},{id:'custom-floor',type:'asset-floor',floorSelector:true},{id:'custom-floor',type:'asset-floor',backdrop:true}]){

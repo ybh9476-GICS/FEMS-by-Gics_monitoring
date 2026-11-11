@@ -307,6 +307,12 @@
         if(type===this.armed&&point)this.handlers.place(type,Math.round(point.x*2)/2,Math.round(point.z*2)/2);
       });
       onSurface('contextmenu',e=>e.preventDefault());
+      onSurface('dblclick',e=>{
+        if(!this.readOnly||e.button!==0||this.pickTarget(e)?.id)return;
+        if(this.connections?.pick(e,this.camera,this.host.getBoundingClientRect()))return;
+        e.preventDefault();
+        this.host.dispatchEvent(new root.CustomEvent('fems-background-dblclick',{bubbles:true,detail:{clientX:e.clientX,clientY:e.clientY}}));
+      });
       onSurface('wheel',e=>{e.preventDefault();if(!this.drag?.axis&&!this.drag?.connection)this.zoom(Math.exp(Math.sign(e.deltaY)*.09));},{passive:false});
       onSurface('pointerdown',e=>{if(this.drag||(e.button!==0&&e.button!==2)||(this.mode==='plan'&&e.button===2))return;
         this.cancelFocus();

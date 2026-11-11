@@ -21,6 +21,11 @@
       this.svg.addEventListener('pointermove',e=>{const d=this.drag;if(!d||d.id!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!this.moved&&Math.hypot(dx,dy)>3){this.moved=true;this.svg.setPointerCapture(e.pointerId);}if(this.moved){this.offset={x:d.offset.x+dx,y:d.offset.y+dy};this.transform();}});
       const end=()=>{this.drag=null;};this.svg.addEventListener('pointerup',end);this.svg.addEventListener('pointercancel',end);this.svg.addEventListener('lostpointercapture',end);
       this.svg.addEventListener('click',e=>{if(e.target.closest('[data-node],[data-edge]'))return;if(this.moved){this.moved=false;return;}this.edge=null;this.api.select(null);});
+      this.svg.addEventListener('dblclick',e=>{
+        if(!this.readOnly||e.button!==0||e.target.closest('[data-node],[data-edge]'))return;
+        e.preventDefault();
+        this.host.dispatchEvent(new root.CustomEvent('fems-background-dblclick',{bubbles:true,detail:{clientX:e.clientX,clientY:e.clientY}}));
+      });
       this.svg.addEventListener('keydown',e=>{if(e.target!==this.svg||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();e.stopPropagation();this.offset.x+=e.key==='ArrowLeft'?40:e.key==='ArrowRight'?-40:0;this.offset.y+=e.key==='ArrowUp'?40:e.key==='ArrowDown'?-40:0;this.transform();});
       new ResizeObserver(()=>{if(this.active){if(!this.fitted)this.fit(true);else this.transform();}}).observe(this.canvas);
     }
