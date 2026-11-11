@@ -170,7 +170,7 @@
       if(d&&canvas.hasPointerCapture(d.pointerId))canvas.releasePointerCapture(d.pointerId);
       this.updateCursor();this.invalidate();
     }
-    updateCursor(){this.host.style.cursor=this.drag?.item?'default':this.drag?.moved&&(this.drag.button===2||!this.armed)?'var(--cursor-grabbing, grabbing)':this.armed?'crosshair':this.move||this.selected||this.connectionSelection||this.hovered||this.hoverLink||this.hoverAxis?'default':'var(--cursor-grab, grab)';}
+    updateCursor(){this.host.style.cursor=this.drag?.item?'var(--cursor-default, default)':this.drag?.moved&&(this.drag.button===2||!this.armed)?'var(--cursor-grabbing, grabbing)':this.armed?'var(--cursor-crosshair, crosshair)':this.move||this.selected||this.connectionSelection||this.hovered||this.hoverLink||this.hoverAxis?'var(--cursor-default, default)':'var(--cursor-grab, grab)';}
     resize(){const w=this.host.clientWidth,h=this.host.clientHeight;if(!w||!h)return;this.width=w;this.height=h;this.renderer.setSize(w,h);this.perspective.aspect=w/h;this.perspective.updateProjectionMatrix();this.updateCamera();}
     updateCamera(){this.perspective.far=Math.max(600,this.radius*4+Math.hypot(this.state?.site.width||60,this.state?.site.depth||40)*2);this.perspective.near=Math.max(.01,this.radius/10000);this.perspective.updateProjectionMatrix();const aspect=(this.width||1)/(this.height||1);this.ortho.left=-this.radius*aspect/2;this.ortho.right=this.radius*aspect/2;this.ortho.top=this.radius/2;this.ortho.bottom=-this.radius/2;const levels=this.state?.equipment||[],top=Math.max(0,...levels.map(e=>(e.y||0)+e.height)),bottom=Math.min(0,...levels.map(e=>e.y||0));this.ortho.near=.01;this.ortho.far=Math.max(600,top-bottom+200);this.ortho.updateProjectionMatrix();this.ortho.position.set(this.target.x,Math.max(100,top+100),this.target.z);this.ortho.up.set(-Math.sin(this.planYaw),0,-Math.cos(this.planYaw));this.ortho.lookAt(this.target);
       this.perspective.position.set(this.target.x+this.radius*Math.sin(this.yaw)*Math.cos(this.pitch),this.target.y+this.radius*Math.sin(this.pitch),this.target.z+this.radius*Math.cos(this.yaw)*Math.cos(this.pitch));this.perspective.lookAt(this.target);this.camera.updateMatrixWorld();this.invalidate();}
@@ -339,7 +339,7 @@
           const connectionAxis=link.axis?this.connectionGizmo.begin(link.axis,this.ray.ray,this.camera,source):null;
           const snapPoints=(route.crossSpace||route.externalFloor)?this.connections.lines.filter(l=>l.id!==link.id).flatMap(l=>l.points.map(p=>({...p,y:p.y??l.height}))):undefined;
           this.drag={connection:link,snapPoints,connectionAxis,crossSpace:route.crossSpace,portal:route.externalFloor,height,button:0,pointerId:e.pointerId,x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,moved:false,offset:p&&source?{x:source.x-p.x,z:source.z-p.z}:{x:0,z:0}};
-          canvas.setPointerCapture(e.pointerId);this.host.style.cursor='default';return;
+          canvas.setPointerCapture(e.pointerId);this.host.style.cursor='var(--cursor-default, default)';return;
         }
         const point=this.floor(e);this.drag={x:e.clientX,y:e.clientY,lastX:e.clientX,lastY:e.clientY,button:e.button,pointerId:e.pointerId,id,label:target.label,moved:false};
         if(!this.readOnly&&id&&this.move&&!additive&&e.button===0&&point){this.handlers.select(id);const item=this.state.equipment.find(v=>v.id===id);this.drag.item=M.clone(item);this.drag.offset={x:item.x-point.x,z:item.z-point.z};}

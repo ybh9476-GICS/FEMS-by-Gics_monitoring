@@ -128,7 +128,7 @@ test('XZ 드래그는 3D·평면도에서 한 번에 실행 취소하고 취소�
 test('이동 모드를 켜지 않아도 기즈모 드래그가 실시간 반영되고 한 번의 실행 취소로 복원된다', () => {
   const {scene,h,listeners,previews,start}=sceneFixture(), before=M.clone(h.current);
   listeners.pointerdown({button:0,pointerId:1,clientX:100,clientY:100,world:start});
-  assert.equal(scene.drag.axis,'x');assert.equal(scene.host.style.cursor,'default');
+  assert.equal(scene.drag.axis,'x');assert.equal(scene.host.style.cursor,'var(--cursor-default, default)');
   for(const delta of [1,2,3])listeners.pointermove({pointerId:1,clientX:100+delta*10,clientY:100,world:start.clone().add(new T.Vector3(delta,0,0))});
   assert.equal(previews.length,3);assert.equal(h.current.equipment[2].x,3);assert.equal(h.past.length,0);
   listeners.pointerup({button:0,pointerId:1});assert.equal(h.past.length,1);

@@ -5,7 +5,7 @@ body[data-workspace-mode="monitoring"] .scene-controls { display: none; }
 :root[data-theme="dark"] #monitor-companion, :root[data-theme="dark"] #companion-character, :root[data-theme="dark"] #companion-chat { color-scheme: dark; --chat-panel: #19272e; --chat-input: #132128; --chat-text: #dfebe8; --chat-muted: #a2b6b4; --chat-line: #35494e; --chat-accent: #75d4b5; --chat-selected: #28483f; }
 #monitor-companion[hidden], #companion-character[hidden], #companion-chat[hidden] { display: none; }
 #monitor-companion button, #companion-chat { pointer-events: auto; }
-#monitor-companion button, #companion-character button, #companion-chat button { color: inherit; font: inherit; cursor: pointer; }
+#monitor-companion button, #companion-character button, #companion-chat button { color: inherit; font: inherit; cursor:var(--cursor-pointer, pointer); }
 #monitor-companion button:focus-visible, #companion-character button:focus-visible, #companion-chat button:focus-visible { outline: 2px solid var(--chat-accent); outline-offset: 3px; }
 #companion-summon { position: absolute; right: 22px; bottom: 18px; width: 32px; height: 28px; padding: 0; display: grid; place-items: center; border: 1px solid var(--chat-line); border-radius: 6px; background: var(--chat-panel); box-shadow: 0 3px 10px #0002; }
 #companion-summon:hover, #companion-summon[aria-pressed="true"] { background: var(--chat-selected); color: var(--chat-accent); }
@@ -47,7 +47,7 @@ body[data-workspace-mode="monitoring"] .scene-controls { display: none; }
 #companion-input { flex: 1; min-width: 0; width: 100%; padding: 2px 4px; border: 0; outline: none; box-shadow: none; resize: none; background: transparent; color: var(--chat-text); font: inherit; line-height: 1.5; }
 #companion-input::placeholder { color: var(--chat-muted); }
 #companion-send { display: grid; place-items: center; width: 32px; height: 32px; padding: 5px; flex-shrink: 0; background: var(--chat-selected); color: var(--chat-accent) !important; border: 0; border-radius: 8px; }
-#companion-send:disabled { opacity: .35; cursor: default; }
+#companion-send:disabled { opacity: .35; cursor:var(--cursor-default, default); }
 #companion-input-hint { display: block; color: var(--chat-muted); font-size: 10px; margin-top: 5px; }
 @media (prefers-reduced-motion: reduce) { #companion-figure, #companion-figure > svg { animation: none; } }
 

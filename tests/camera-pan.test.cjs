@@ -397,15 +397,15 @@ for (const mode of ['plan', '3d']) {
     const { scene, listeners } = fixture(mode);
     scene.pick = () => 'test';
     listeners.pointermove({ clientX: 200, clientY: 200 });
-    assert.equal(scene.host.style.cursor, 'default');
+    assert.equal(scene.host.style.cursor, 'var(--cursor-default, default)');
     listeners.pointerdown({ button: 0, pointerId: 1, clientX: 200, clientY: 200 });
     listeners.pointerup({ button: 0, pointerId: 1, clientX: 200, clientY: 200 });
-    assert.equal(scene.selected, 'test');assert.equal(scene.host.style.cursor, 'default');
+    assert.equal(scene.selected, 'test');assert.equal(scene.host.style.cursor, 'var(--cursor-default, default)');
     scene.move = true;
     const before = scene.camera.quaternion.clone();
     listeners.pointerdown({ button: 0, pointerId: 1, clientX: 200, clientY: 200 });
     listeners.pointermove({ clientX: 260, clientY: 240 });
-    assert.equal(scene.host.style.cursor, 'default');
+    assert.equal(scene.host.style.cursor, 'var(--cursor-default, default)');
     assert.ok(before.equals(scene.camera.quaternion));assert.equal(scene.target.length(), 0);
     listeners.pointerup({ button: 0, pointerId: 1, clientX: 260, clientY: 240 });
     assert.deepEqual(scene.committedMove, { id: 'test', x: 3, z: 2 });
@@ -414,7 +414,7 @@ for (const mode of ['plan', '3d']) {
     listeners.pointermove({ clientX: 260, clientY: 240 });
     listeners.pointerup({ button: 2, pointerId: 1, clientX: 260, clientY: 240 });
     assert.equal(scene.target.length(), 0);if(mode === 'plan')assert.ok(before.equals(scene.camera.quaternion));else assert.ok(before.angleTo(scene.camera.quaternion) > .1);assert.equal(scene.committedMove, null);
-    assert.equal(scene.selected, 'test');assert.equal(scene.host.style.cursor, 'default');
+    assert.equal(scene.selected, 'test');assert.equal(scene.host.style.cursor, 'var(--cursor-default, default)');
   });
 }
 

@@ -29,18 +29,18 @@
   border-radius: 0 4px 4px 0;
   background: #f3f6f7;
   color: #71878b;
-  cursor: ew-resize;
+  cursor:var(--cursor-ew-resize, ew-resize);
   touch-action: none;
   user-select: none;
 }
 .number-scrub:hover { background: #e6f2ec; color: #227b69; }
 .live-edit-note { font-size: 10px; color: #558875; margin: 0 0 12px; line-height: 1.7; }
-.ratio-lock { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #4d6559; cursor: pointer; }
-.ratio-lock input { width: 14px; height: 14px; margin: 0; padding: 0; accent-color: #227b69; cursor: pointer; }
+.ratio-lock { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; color: #4d6559; cursor:var(--cursor-pointer, pointer); }
+.ratio-lock input { width: 14px; height: 14px; margin: 0; padding: 0; accent-color: #227b69; cursor:var(--cursor-pointer, pointer); }
 .gizmo-axis-label { position: absolute; transform: translate(-50%, -50%); font-size: 12px; font-weight: 700; background: #ffffffeb; border: 1px solid currentColor; border-radius: 4px; padding: 2px 5px; pointer-events: none; }
-.gizmo-rotate { position: absolute; z-index: 2; transform:translate(-50%,-50%); padding:0; min-width:0; border:1px solid #278579; border-radius:8px; color:#206e65; background:#f7fffbee; font-size:10px; line-height:1; font-weight:600; cursor:pointer; }
+.gizmo-rotate { position: absolute; z-index: 2; transform:translate(-50%,-50%); padding:0; min-width:0; border:1px solid #278579; border-radius:8px; color:#206e65; background:#f7fffbee; font-size:10px; line-height:1; font-weight:600; cursor:var(--cursor-pointer, pointer); }
 .gizmo-rotate-arc { position:absolute; inset:0; width:100%; height:100%; z-index:2; overflow:hidden; pointer-events:none; }
-.gizmo-rotate-arc path { fill:none; stroke:#278579; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; pointer-events:stroke; cursor:pointer; }
+.gizmo-rotate-arc path { fill:none; stroke:#278579; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; pointer-events:stroke; cursor:var(--cursor-pointer, pointer); }
 .gizmo-rotate-arc path:hover { stroke:#135a51; stroke-width:5; }
 .gizmo-rotate-arc.disabled { opacity:.4; }
 .gizmo-rotate-arc.disabled path { pointer-events:none; }
@@ -52,4 +52,4 @@
 .number-control input:disabled + .number-scrub,
 .number-control input[readonly] + .number-scrub { pointer-events: none; opacity: .4; }
 body[data-number-scrubbing="true"],
-body[data-number-scrubbing="true"] * { cursor: ew-resize !important; user-select: none !important; }
+body[data-number-scrubbing="true"] * { cursor:var(--cursor-ew-resize, ew-resize) !important; user-select: none !important; }

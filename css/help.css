@@ -31,7 +31,7 @@
 .help-footer button{font-size:12px;min-width:72px}
 .help-figures{display:flex;flex-wrap:wrap;align-items:flex-start;gap:18px;margin-top:20px}
 .help-figure{margin:0;max-width:100%;flex:1 1 240px;min-width:0}
-.help-image-open{display:flex;align-items:center;flex-direction:column;gap:10px;width:100%;padding:12px;background:#f6f9f8;border:1px solid #dce6e1;border-radius:8px;white-space:normal;cursor:zoom-in}
+.help-image-open{display:flex;align-items:center;flex-direction:column;gap:10px;width:100%;padding:12px;background:#f6f9f8;border:1px solid #dce6e1;border-radius:8px;white-space:normal;cursor:var(--cursor-zoom-in, zoom-in)}
 .help-image-open img{display:block;width:auto;height:auto;max-width:100%;max-height:290px;object-fit:contain}
 .help-image-open span{font-size:11px;color:#376b5c}
 .help-figure figcaption{font-size:12px;line-height:1.7;color:#61786d;margin-top:8px}
